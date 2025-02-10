@@ -11,7 +11,7 @@ close all
 %% Declarations
 
 % Total mass
-m = ; %(kg)
+m = 65.0; %(kg)
 
 % Total height
 h = ; %(m)
@@ -20,10 +20,10 @@ h = ; %(m)
 g = -9.81; %m/s^2
 
 % Lengths (m)
-r1 = 0.4;
-r2 = 0.8;
-r3 = 0.6;
-r4 = 0.4;
+r1 = 0.665;
+r2 = 0.185;
+r3 = 0.44;
+r4 = 0.51;
 
 
 % Link information (might not need these)
