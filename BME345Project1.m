@@ -27,7 +27,7 @@ r4 = 0.51;
 
 
 % Link information (might not need these)
-p = ; %density (kg/m^3)
+p = 985; %density (kg/m^3)
 l = ; %height or length (m)
 d = ; %depth (m)
 
