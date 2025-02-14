@@ -39,7 +39,7 @@ m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
 m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
-k1 = ; %hip to bike pedal
+k1 = diameterR1 / sqrt(2); %hip to bike pedal
 k2 = ; %bike pedal to foot
 k3 = 0.416; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
