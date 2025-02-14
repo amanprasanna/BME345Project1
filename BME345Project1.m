@@ -34,7 +34,7 @@ pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
 
 % Mass of Links (kg)
 m1 = ;
-m2 = ;
+m2 = .168 + .698; % pedal + pedal crank (kg)
 m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
 m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
