@@ -24,7 +24,8 @@ r4 = 0.51; %knee to hip
 
 
 % Link information (might not need these)
-p = 985; %density (kg/m^3)
+pHuman = 985; %density (kg/m^3)
+pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
 %h1 = ; %height or length (m)
 %d1 = ; %depth (m)
 %h2 = ; %height or length (m)
