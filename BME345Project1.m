@@ -36,8 +36,8 @@ p = 985; %density (kg/m^3)
 % Length Ratios from Anthropometric Table
 
 % Mass of Links (kg)
-m1 = p * h * d * r1;
-m2 = p * h * d * r2;
+m1 = ;
+m2 = ;
 m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
 m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
