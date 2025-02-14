@@ -13,27 +13,22 @@ close all
 % Total mass
 m = 65.0; %(kg)
 
-% Total height
-%h = ; %(m)
-
 %Gravity
 g = -9.81; %m/s^2
 
 % Lengths (m)
-r1 = 0.665; %bike pedal to hip
-r2 = 0.185; %foot to bike pedal
-r3 = 0.44; %knee to foot 
-r4 = 0.51; %hip to knee
+r1 = 0.665; %hip to bike pedal
+r2 = 0.185; %bike pedal to foot
+r3 = 0.44; %foot to knee 
+r4 = 0.51; %knee to hip
 
 
 % Link information (might not need these)
 p = 985; %density (kg/m^3)
-%l = ; %height or length (m)
-%d = ; %depth (m)
-
-% Mass Ratios from Anthropometric Table
-
-% Length Ratios from Anthropometric Table
+%h1 = ; %height or length (m)
+%d1 = ; %depth (m)
+%h2 = ; %height or length (m)
+%d2 = ; %depth (m)
 
 % Mass of Links (kg)
 m1 = ;
@@ -41,11 +36,17 @@ m2 = ;
 m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
 m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
+% Radius of Gyration (w.r.t CoG) of Links
+k1 = ; %hip to bike pedal
+k2 = ; %bike pedal to foot
+k3 = 0.416; %foot and leg (from anthropometric table)
+k4 = 0.323; %thigh (from anthropometric table)
+
 % Moments of Inertia (kg*m^2)
-I1 = ;
-I2 = ;
-I3 = ;
-I4 = ;
+I1 = m1 * k1^2;
+I2 = m2 * k2^2;
+I3 = m3 * k3^2;
+I4 = m4 * k4^2;
 
 % Crank Inputs if any
 Ta = ; %N*m
