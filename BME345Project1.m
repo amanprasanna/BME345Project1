@@ -14,22 +14,22 @@ close all
 m = 65.0; %(kg)
 
 % Total height
-h = ; %(m)
+%h = ; %(m)
 
 %Gravity
 g = -9.81; %m/s^2
 
 % Lengths (m)
-r1 = 0.665;
-r2 = 0.185;
-r3 = 0.44;
-r4 = 0.51;
+r1 = 0.665; %bike pedal to hip
+r2 = 0.185; %foot to bike pedal
+r3 = 0.44; %knee to foot 
+r4 = 0.51; %hip to knee
 
 
 % Link information (might not need these)
 p = 985; %density (kg/m^3)
-l = ; %height or length (m)
-d = ; %depth (m)
+%l = ; %height or length (m)
+%d = ; %depth (m)
 
 % Mass Ratios from Anthropometric Table
 
@@ -38,8 +38,8 @@ d = ; %depth (m)
 % Mass of Links (kg)
 m1 = p * h * d * r1;
 m2 = p * h * d * r2;
-m3 = p * h * d * r3;
-m4 = ;
+m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
+m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
 % Moments of Inertia (kg*m^2)
 I1 = ;
