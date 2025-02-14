@@ -40,7 +40,7 @@ m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
 k1 = diameterR1 / sqrt(2); %hip to bike pedal
-k2 = ; %bike pedal to foot
+k2 = ; %bike pedal to foot (assume center to bike pedal is a rectangular prism...need to take measurements on this)
 k3 = 0.416; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
