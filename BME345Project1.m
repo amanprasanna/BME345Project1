@@ -77,7 +77,13 @@ w4 = ans(4);
 al3 = ans(5);
 al4 = ans(6);
 
-%% Plotting
+%% Graph of the Angles, Angular Accelerations, and Angular Velocities
+
+
+%% Graph of Angle 2 vs. Torque of Pedal and Hips
+
+
+%% Graph of the Force Components vs. Angle 2
 
 
 
