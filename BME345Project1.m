@@ -51,10 +51,10 @@ I3 = m3 * k3^2;
 I4 = m4 * k4^2;
 
 % Crank Inputs if any
-Ta = ; %N*m
+Ta = [0 120]; %N*m
 th2 =  * pi/180; %rads
-w2 = ; %rad/s
-al2 = ; %rad/s^2
+w2 = 1; %rad/s
+al2 = 0; %rad/s^2
 th1 =  * pi/180; %rads
 
 
