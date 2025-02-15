@@ -54,11 +54,11 @@ I3 = m3 * k3^2;
 I4 = m4 * k4^2;
 
 % Crank Inputs if any
-Ta = [0 120]; %N*m
-th2 =  * pi/180; %rads
+Ta = [0 125]; %N*m
+th2 = 180 * pi/180; %rads
 w2 = 1; %rad/s
 al2 = 0; %rad/s^2
-th1 =  * pi/180; %rads
+th1 = 150 * pi/180; %rads
 
 
 % Forces Due to Gravity
