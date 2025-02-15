@@ -28,7 +28,7 @@ pHuman = 985; %density (kg/m^3)
 pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
 diameterR1 = .102; % diameter of frame 1 on the bike (cm to m)
 lengthCrank = .21; % m
-height = .03; %m
+heightCrank = .03; %m
 width = .005; %m
 %h1 = ; %height or length (m)
 %d1 = ; %depth (m)
@@ -43,7 +43,7 @@ m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
 k1 = diameterR1 / sqrt(2); %hip to bike pedal
-k2 = ; %bike pedal to foot (assume center to bike pedal is a rectangular prism...need to take measurements on this)
+k2 = heightCrank / sqrt(12); %bike pedal to foot (assume center to bike pedal is a rectangular prism...need to take measurements on this)
 k3 = 0.416; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
