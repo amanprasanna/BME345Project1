@@ -26,7 +26,10 @@ r4 = 0.51; %knee to hip
 % Link information (might not need these)
 pHuman = 985; %density (kg/m^3)
 pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
-%diameterR1 = ; % diameter of frame 1 on the bike (cm to m)
+diameterR1 = .102; % diameter of frame 1 on the bike (cm to m)
+lengthCrank = .21; % m
+height = .03; %m
+width = .005; %m
 %h1 = ; %height or length (m)
 %d1 = ; %depth (m)
 %h2 = ; %height or length (m)
@@ -79,7 +82,28 @@ al3 = ans(5);
 al4 = ans(6);
 
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
+figure(1)
+subplot(3,1,1)
+plot(th2new,th2new,"r",th2new,th3,"b",th2new,th4,"g","LineWidth",1.5)
+title("\theta_2 \theta_3 \theta_4 vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("\theta_2, \theta_3, and \theta_4 in rads")
+legend("\theta_2","\theta_3","\theta_4")
 
+subplot(3,1,2)
+plot(th2new,th3,"b")
+plot(th2new,om2new,"r",th2new,om3,"b",th2new,om4,"g","LineWidth",1.5)
+title("\omega_2 \omega_3 \omega_4 vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("\omega_2, \omega_3, and \omega_4 in rads/s")
+legend("\omega_2","\omega_3","\omega_4")
+
+subplot(3,1,3)
+plot(th2new,al2new,"r",th2new,al3,"b",th2new,al4,"g","LineWidth",1.5)
+title("\alpha_2 \alpha_3 \alpha_4 vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("\alpha_2, \alpha_3, and \alpha_4 in rads/(s^2)")
+legend("\alpha_2","\alpha_3","\alpha_4")
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips
 
