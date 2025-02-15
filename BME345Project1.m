@@ -106,10 +106,20 @@ ylabel("\alpha_2, \alpha_3, and \alpha_4 in rads/(s^2)")
 legend("\alpha_2","\alpha_3","\alpha_4")
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips
-
+figure(2)
+plot(th2new,th2new,"r",th2new,th3,"b",th2new,th4,"g","LineWidth",1.5)
+title("\theta_2 \theta_3 \theta_4 vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("\theta_2, \theta_3, and \theta_4 in rads")
+legend("\theta_2","\theta_3","\theta_4")
 
 %% Graph of the Force Components vs. Angle 2
-
+figure(3)
+plot(th2new,th2new,"r",th2new,th3,"b",th2new,th4,"g","LineWidth",1.5)
+title("\theta_2 \theta_3 \theta_4 vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("\theta_2, \theta_3, and \theta_4 in rads")
+legend("\theta_2","\theta_3","\theta_4")
 
 
 %% Video Generation
