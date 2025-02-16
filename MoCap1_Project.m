@@ -24,22 +24,26 @@ heightEdge = 1;
 heightRange = 1080;
 
 % Color Adjustments
-lthrR = 230; %red lower threshold
-uthrR = 255; %red upper threshold
+lthrR = 230; %red tape lower threshold
+uthrR = 255; %red tape upper threshold
 
-lthrG = 180; %green lower threshold
-uthrG = 255; %green upper threshold
+lthrG = 180; %green tape lower threshold
+uthrG = 255; %green tape upper threshold
 
-lthrB = 200; %blue lower threshold
-uthrB = 255; %blue upper threshold
+lthrRB = 106;%red lthr for blue tape
+uthrRB = 120;%red uthr for blue tape
+lthrGB = 155;%green lthr for blue tape
+uthrGB = 170;%green uthr for blue tape
+lthrBB = 185;%blue lthr for blue tape
+uthrBB = 210;%blue uthr for blue tape
 
 lthrGen = 110; %generalized lower threshold
 uthrGen = 225; %generalized upper threshold
 
-lthrRY = 220;%red lthr for yellow light
-lthrGY = 170;%green lthr for yellow light
-lthrBY = 40;%blue lthr for yellow light
-uthrBY = 85;%blue uthr for yellow light
+lthrRY = 220;%red lthr for yellow tape
+lthrGY = 170;%green lthr for yellow tape
+lthrBY = 40;%blue lthr for yellow tape
+uthrBY = 85;%blue uthr for yellow tape
 
 %% Video 1: Centroid Movement
 
