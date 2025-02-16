@@ -81,6 +81,24 @@ w4 = ans(4);
 al3 = ans(5);
 al4 = ans(6);
 
+% Finding the x and y positions based on th2, th3, and th4
+for k = 1:length(th2new)
+    r12x(k) = -(r2/2).*cosd(th2new(k)); 
+    r12y(k) = -(r2/2).*sind(th2new(k)); 
+    r32x(k) = (r2/2).*cosd(th2new(k)); 
+    r32y = (r2/2).*sind(th2new(k)); 
+    
+    r23x(k) = -(r3/2).*cos(th3(k)); % Neg due to vector being neg in x and y plane
+    r23y(k) = -(r3/2).*sin(th3(k)); 
+    r43x(k) = (r3/2).*cos(th3(k)); 
+    r43y = (r3/2).*sin(th3(k)); 
+
+    r34x(k) = -(r4/2).*cos(th4(k)); % Neg due to ang has opp direction than vector
+    r34y(k) = -(r4/2).*sin(th4(k));
+    r14x(k) = (r4/2).*cos(th4(k)); 
+    r14y(k) = (r4/2).*sin(th4(k));
+end
+
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
 figure(1)
 subplot(3,1,1)
