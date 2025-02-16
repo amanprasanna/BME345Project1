@@ -99,6 +99,22 @@ for k = 1:length(th2new)
     r14y(k) = (r4/2).*sin(th4(k));
 end
 
+
+% Calculating the al of each link at their COM / midpt
+
+for k = 1:length(r12y)
+    al2x(k) = 0 - (om2new(k).^2).*(r2/2).*cos(th2new(k)); 
+    al2y(k) = 0 - (om2new(k).^2).*(r2/2).*sin(th2new(k)); 
+    
+    al3x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))); 
+    al3y(k) = (0 - (om2new(k)^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k)));
+    
+    al4x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))) ...
+    + (-al4(k).*(r4/2).*sin(th4(k)) - (om4(k).^2)*(r4/2).*cos(th4(k))); 
+    al4y(k) = (0 - (om2new(k).^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k))) ...
+    + (al4(k).*(r4/2).*cos(th4(k)) - (om4(k).^2).*(r4/2).*sin(th4(k))); 
+end
+
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
 figure(1)
 subplot(3,1,1)
