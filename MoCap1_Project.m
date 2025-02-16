@@ -18,10 +18,10 @@ frameStop = 185;
 vid = VideoReader(vidFile);
 
 % For cropping
-widthEdge = 1;
-widthRange = 1920;
+widthEdge = 700;
+widthRange = 600;
 heightEdge = 1;
-heightRange = 1080;
+heightRange = 840;
 
 % Color Adjustments
 lthrR = 230; %red tape lower threshold
