@@ -24,10 +24,10 @@ heightEdge = 1;
 heightRange = 840;
 
 % Color Adjustments
-lthrR = 230; %red tape lower threshold
+lthrR = 220; %red tape lower threshold
 uthrR = 255; %red tape upper threshold
 
-lthrG = 180; %green tape lower threshold
+lthrG = 220; %green tape lower threshold
 uthrG = 255; %green tape upper threshold
 
 lthrRB = 106;%red lthr for blue tape
@@ -64,8 +64,9 @@ for k = frameStart:frameStop
                     (green <= lthrGen) & (blue <= lthrGen)); 
     GframeSliceBW = ((green >= lthrG) & (green <= uthrG) & ...
                     (red <= lthrGen) & (blue <= lthrGen)); 
-    BframeSliceBW = ((blue >= lthrB) & (blue <= uthrB) & ...
-                    (red <= lthrGen) & (green >= lthrG) & (green < uthrGen)); 
+    BframeSliceBW = ((blue >= lthrBB) & (blue <= uthrBB)) & ...
+                    ((red >= lthrRB) & (red <= uthrRB) & ...
+                    (green >= lthrGB) & (green <= uthrGB)); 
     YframeSliceBW = ((red >= lthrRY) & (red <= uthrR) & ...
                     (green >= lthrGY) & (green <= uthrG) & ...
                     (blue >= lthrBY) & (blue <= uthrBY));
