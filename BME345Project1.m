@@ -81,7 +81,7 @@ w4 = ans(4);
 al3 = ans(5);
 al4 = ans(6);
 
-% Finding the x and y positions based on th2, th3, and th4
+% Finding the x and y positions and al components based on th2, th3, and th4
 for k = 1:length(th2new)
     r12x(k) = -(r2/2).*cosd(th2new(k)); 
     r12y(k) = -(r2/2).*sind(th2new(k)); 
@@ -97,6 +97,17 @@ for k = 1:length(th2new)
     r34y(k) = -(r4/2).*sin(th4(k));
     r14x(k) = (r4/2).*cos(th4(k)); 
     r14y(k) = (r4/2).*sin(th4(k));
+
+    al2x(k) = 0 - (om2new(k).^2).*(r2/2).*cos(th2new(k)); 
+    al2y(k) = 0 - (om2new(k).^2).*(r2/2).*sin(th2new(k)); 
+    
+    al3x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))); 
+    al3y(k) = (0 - (om2new(k)^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k)));
+    
+    al4x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))) ...
+    + (-al4(k).*(r4/2).*sin(th4(k)) - (om4(k).^2)*(r4/2).*cos(th4(k))); 
+    al4y(k) = (0 - (om2new(k).^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k))) ...
+    + (al4(k).*(r4/2).*cos(th4(k)) - (om4(k).^2).*(r4/2).*sin(th4(k))); 
 end
 
 
