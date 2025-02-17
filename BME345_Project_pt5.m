@@ -10,7 +10,7 @@ close all
 
 %% Declarations
 % Video Info
-vidFile = 'IMG_0217.mov';
+vidFile = 'Bike_Mirrored.mov';
 frameStart = 1; 
 frameStop = 60; 
 vid = VideoReader(vidFile);
