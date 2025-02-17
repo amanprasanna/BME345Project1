@@ -54,6 +54,7 @@ open(vidObj1) % opens video for recording
 % Step through each frame 
 for k = frameStart:frameStop
     frameSlice = read(vid,k); % loads current frame into frameSlice
+    frameSlice = flip(frameSlice, 2);
 
     frameSliceCrop = imcrop(frameSlice, ...
         [widthEdge, heightEdge, widthRange, heightRange]);
