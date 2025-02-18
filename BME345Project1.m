@@ -22,12 +22,15 @@ r2 = 0.185; %bike pedal to foot
 r3 = 0.44; %foot to knee 
 r4 = 0.51; %knee to hip
 
+% Distal Distances
+thighDistal = 0.567; 
+lowerlegDistal = 0.394; 
 
 % Link information (might not need these)
 pHuman = 985; %density (kg/m^3)
 pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
-diameterR1 = .102; % diameter of frame 1 on the bike (cm to m)
-lengthCrank = .21; % m
+diameterR1 = 0.102; % diameter of frame 1 on the bike (cm to m)
+lengthCrank = 0.21; % m
 heightCrank = .03; %m
 width = .005; %m
 %h1 = ; %height or length (m)
@@ -48,38 +51,63 @@ k3 = 0.416; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
 % Moments of Inertia (kg*m^2)
-I1 = m1 * k1^2;
-I2 = m2 * k2^2;
-I3 = m3 * k3^2;
-I4 = m4 * k4^2;
+I2y = lengthCrank*(heightCrank^3) / 12; % rectangular prism
+I3 = m3*k3^2;
+I4 = m4*k4^2;
 
 % Crank Inputs if any
-Ta = [0 125]; %N*m
-th2 = 180 * pi/180; %rads
-w2 = 1; %rad/s
+Ta = 125; %N*m
+th2 = 180*pi/180; %rads
+om2 = 1; %rad/s
 al2 = 0; %rad/s^2
-th1 = 150 * pi/180; %rads
-
+th1 = 225*pi/180; %rads
 
 % Forces Due to Gravity
-F1g = ; %N
-F2g = ; %N
-F3g = ; %N
-F4g = ; %N
+F1g = m1*g; %N
+F2g = m2*g; %N
+F3g = m3*g; %N
+F4g = m4*g; %N
+
+
+% Steps 
+stepSize = pi/12; 
+maxRev = 3*pi; 
+th2new = th2:stepSize:maxRev; 
+
+integerArray = numel(th2new);
+
+% T hip
+Thip = ones(1,length(th2new)); 
+[~, indexT0] = min(abs(th2new - (3*pi/2))); 
+[~, indexT1] = min(abs(th2new - (5*pi/2))); 
+
+Thip = Thip*Ta; 
+Thip(indexT0:indexT1) = 0; 
 
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
-guess = [7*pi/4 3*pi/4 1 1 1 1];
-options = optimoptions('fsolve','Display','final')
+guess = [(pi/4) (pi/4) 1 1 1 1];
+options = optimoptions('fsolve','Display','final'); 
 
 %% Calculations
 
-ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2,w2,al2)
-th3 = ans(1);
-th4 = ans(2); 
-w3 = ans(3);
-w4 = ans(4);
-al3 = ans(5);
-al4 = ans(6);
+% Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
+for k = 1:integerArray
+    current_om2 = sqrt((om2^2) + 2*al2*(th2new(k)-th2new(1))); % need a new initial acceleration velocity
+    om2new(k) = current_om2;
+    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2new(k),al2);
+    %
+    % Redefine the guess as the recently solved parameters
+    guess = [ans(1) ans(2) ans(3) ans(4) ans(5) ans(6)];
+    %
+    % Record newly calculated parameters in a vector or matrix.
+    th3(k) = ans(1);
+    th4(k) = ans(2);
+    om3(k) = ans(3);
+    om4(k) = ans(4);
+    al3(k) = ans(5);
+    al4(k) = ans(6);
+    
+end
 
 % Finding the x and y positions and al components based on th2, th3, and th4
 for k = 1:length(th2new)
@@ -110,6 +138,7 @@ for k = 1:length(th2new)
     + (al4(k).*(r4/2).*cos(th4(k)) - (om4(k).^2).*(r4/2).*sin(th4(k))); 
 
 end
+
 
 % Solving for the Force Components
 
@@ -142,6 +171,11 @@ F(:,k)= A\b;
 
 end
 
+% Solving for Thigh Force Components to Graph 
+F4x = F(end-2, :) + F(end-5, :); % force of the thigh in x direction (N)
+F4y = F(end-1, :) + F(end-4) + F4g; % force of the thigh in y direction (N)
+F4 = sqrt( (F4x.^2) + (F4y.^2)); 
+% F4perpenicular = F4.*cos(); 
 
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
 figure(1)
@@ -161,7 +195,7 @@ ylabel("\omega_2, \omega_3, and \omega_4 in rads/s")
 legend("\omega_2","\omega_3","\omega_4")
 
 subplot(3,1,3)
-plot(th2new,al2new,"r",th2new,al3,"b",th2new,al4,"g","LineWidth",1.5)
+plot(th2new,al2,"r",th2new,al3,"b",th2new,al4,"g","LineWidth",1.5)
 title("\alpha_2 \alpha_3 \alpha_4 vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("\alpha_2, \alpha_3, and \alpha_4 in rads/(s^2)")
@@ -169,19 +203,19 @@ legend("\alpha_2","\alpha_3","\alpha_4")
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips
 figure(2)
-plot(th2new,th2new,"r",th2new,th3,"b",th2new,th4,"g","LineWidth",1.5)
-title("\theta_2 \theta_3 \theta_4 vs. \theta_2")
+plot(th2new,Thip,"r",th2new,F(end, :),"b","LineWidth",1.5)
+title("Torque at the Pedal and Hips vs. \theta_2")
 xlabel("\theta_2 in radians")
-ylabel("\theta_2, \theta_3, and \theta_4 in rads")
-legend("\theta_2","\theta_3","\theta_4")
+ylabel("Torque (N*m)")
+legend("Torque of Hips","Torque of Pedals")
 
 %% Graph of the Force Components vs. Angle 2
 figure(3)
-plot(th2new,th2new,"r",th2new,th3,"b",th2new,th4,"g","LineWidth",1.5)
-title("\theta_2 \theta_3 \theta_4 vs. \theta_2")
+plot(th2new,F4,"r",th2new,th3,"b", "LineWidth",1.5)
+title("Force Components Parallel & Perpendicular to the Thigh vs. \theta_2")
 xlabel("\theta_2 in radians")
-ylabel("\theta_2, \theta_3, and \theta_4 in rads")
-legend("\theta_2","\theta_3","\theta_4")
+ylabel("Force (N)")
+legend("Force Parallel to Thigh","Force Perpendicular to Thigh")
 
 
 %% Video Generation
