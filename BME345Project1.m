@@ -205,7 +205,7 @@ legend("Torque of Hips","Torque of Pedals")
 
 %% Graph of the Force Components vs. Angle 2
 figure(3)
-plot(th2new,F4,"r",th2new,th2new,"b", "LineWidth",1.5)
+plot(th2new,FthighParallel,"r",th2new,FthighPerpendicular,"b", "LineWidth",1.5)
 title("Force Components Parallel & Perpendicular to the Thigh vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Force (N)")
