@@ -24,7 +24,10 @@ r4 = 0.51; %knee to hip
 
 % Distal Distances
 thighDistal = 0.567; 
+thighProximal = 0.433; 
+
 lowerlegDistal = 0.394; 
+lowerlegProximal = 0.606; 
 
 % Link information (might not need these)
 pHuman = 985; %density (kg/m^3)
@@ -41,8 +44,8 @@ width = .005; %m
 % Mass of Links (kg)
 m1 = 1.0; % frame mass approximation
 m2 = .168 + .698; % pedal + pedal crank (kg)
-m3 = 0.061 * m; %foot and leg (knee to foot) using anthropometric table
-m4 = 0.100 * m; %thigh (hip to knee) using anthropometric table
+m3 = 0.061*m; %foot and leg (knee to foot) using anthropometric table
+m4 = 0.100*m; %thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
 k1 = diameterR1 / sqrt(2); %hip to bike pedal
@@ -51,7 +54,7 @@ k3 = 0.416; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
 % Moments of Inertia (kg*m^2)
-I2y = lengthCrank*(heightCrank^3) / 12; % rectangular prism
+I2y = m*(lengthCrank^2 + heightCrank^2) / 12; % rectangular prism
 I3 = m3*k3^2;
 I4 = m4*k4^2;
 
@@ -118,24 +121,24 @@ for k = 1:length(th2new)
     
     r23x(k) = -(r3*lowerlegDistal).*cos(th3(k)); % lower leg cannot be divided by 2
     r23y(k) = -(r3*lowerlegDistal).*sin(th3(k)); 
-    r43x(k) = (r3*lowerlegDistal).*cos(th3(k)); 
-    r43y(k) = (r3*lowerlegDistal).*sin(th3(k)); 
+    r43x(k) = (r3*lowerlegProximal).*cos(th3(k)); 
+    r43y(k) = (r3*lowerlegProximal).*sin(th3(k)); 
 
     r34x(k) = -(r4*thighDistal).*cos(th4(k)); % thigh cannot be divided by 2 
     r34y(k) = -(r4*thighDistal).*sin(th4(k));
-    r14x(k) = (r4*thighDistal).*cos(th4(k)); 
-    r14y(k) = (r4*thighDistal).*sin(th4(k));
+    r14x(k) = (r4*thighProximal).*cos(th4(k)); 
+    r14y(k) = (r4*thighProximal).*sin(th4(k));
 
     al2x(k) = 0 - (om2new(k).^2).*(r2/2).*cos(th2new(k)); 
     al2y(k) = 0 - (om2new(k).^2).*(r2/2).*sin(th2new(k)); 
     
-    al3x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))); 
-    al3y(k) = (0 - (om2new(k)^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k)));
+    al3x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2new(k)^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
     
-    al4x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3/2).*sin(th3(k)) - (om3(k)^2)*(r3/2)*cos(th3(k))) ...
-    + (-al4(k).*(r4/2).*sin(th4(k)) - (om4(k).^2)*(r4/2).*cos(th4(k))); 
+    al4x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))) ...
+    + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
     al4y(k) = (0 - (om2new(k).^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k))) ...
-    + (al4(k).*(r4/2).*cos(th4(k)) - (om4(k).^2).*(r4/2).*sin(th4(k))); 
+    + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
 
 end
 
@@ -157,7 +160,7 @@ A = [1    0     1    0    0    0    0     0    0    0    0    0    0;
      0    0     0    1    0    1    0     0    0    0    0    0    0;
      0    0     0    0    0    0    1     0    1    0    0    0    0;
      0    0     0    0    0    0    0     1    0    1    0    0    0];
-% % 
+
 % % %Right hand side of the equation/ known variables
 % % % Note to self: need to fix Ta
 if (any(th2new) >= pi && any(th2new) <= 3*pi/2) || (any(th2new) >= 5*pi/2 && any(th2new) <= 3*pi)
@@ -175,7 +178,8 @@ end
 F4x = F(end-2, :) + F(end-5, :); % force of the thigh in x direction (N)
 F4y = F(end-1, :) + F(end-4) + F4g; % force of the thigh in y direction (N)
 F4 = sqrt( (F4x.^2) + (F4y.^2)); 
-% F4perpenicular = F4.*cos(); 
+% F4parallel = F4.*
+% F4perpenicular = F4.*; 
 
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
 figure(1)
@@ -211,7 +215,7 @@ legend("Torque of Hips","Torque of Pedals")
 
 %% Graph of the Force Components vs. Angle 2
 figure(3)
-plot(th2new,F4,"r",th2new,th3,"b", "LineWidth",1.5)
+plot(th2new,F4,"r",th2new,th2new,"b", "LineWidth",1.5)
 title("Force Components Parallel & Perpendicular to the Thigh vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Force (N)")
