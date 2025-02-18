@@ -168,11 +168,8 @@ F(:,k)= A\b;
 end
 
 % Solving for Thigh Force Components to Graph 
-F4x = F(end-2, :) + F(end-5, :); % force of the thigh in x direction (N)
-F4y = F(end-1, :) + F(end-4) + F4g; % force of the thigh in y direction (N)
-F4 = sqrt( (F4x.^2) + (F4y.^2)); 
-% F4parallel = F4.*
-% F4perpenicular = F4.*; 
+FthighParallel = F(end-5, :).*cos(th4); % force of the thigh in x direction (N)
+FthighPerpendicular = F(end-4, :).*cos(th4 + (pi/2)); % force of the thigh in y direction (N)
 
 %% Graph of the Angles, Angular Accelerations, and Angular Velocities
 figure(1)
