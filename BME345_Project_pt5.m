@@ -15,6 +15,9 @@ frameStart = 1;
 frameStop = 60; 
 vid = VideoReader(vidFile);
 
+% Figure Background
+background = 'Bike_Background.png';
+
 % For cropping
 widthEdge = 700;
 widthRange = 630;
@@ -49,8 +52,12 @@ uthrGY = 190;%green uthr for yellow tape
 lthrBY = 0;%blue lthr for yellow tape
 uthrBY = 10;%blue uthr for yellow tape
 
-%% Determining Centroid Movement
+r1 = 0.665; %hip to bike pedal (m)
+r2 = 0.185; %bike pedal to foot (m)
+r3 = 0.44; %foot to knee (m)
+r4 = 0.51; %knee to hip (m)
 
+%% Determining Centroid Movement
 
 % Step through each frame 
 for k = frameStart:frameStop
@@ -97,7 +104,67 @@ for k = frameStart:frameStop
 
 end
 
-%% Stick Figure Video
+%% Pixel to Meter Conversion & Vector Math for Angle Guesses
+
+%Pixel position vectors
+r1Vec = [YxPos(1)-GxPos(1), YyPos(1)-GyPos(1)];
+r2Vec = [BxPos(1)-YxPos(1), ByPos(1)-YyPos(1)];
+r3Vec = [RxPos(1)-BxPos(1), RyPos(1)-ByPos(1)];
+r4Vec = [GxPos(1)-RxPos(1), GyPos(1)-RyPos(1)];
+
+%Pixel magnitudes
+r1PxMag = vecnorm(r1Vec);
+r2PxMag = vecnorm(r2Vec);
+r3PxMag = vecnorm(r3Vec);
+r4PxMag = vecnorm(r3Vec);
+
+pxmconv = [r1/r1PxMag, r2/r2PxMag, r3/r3PxMag, r4/r4PxMag];
+px_mConv = mean(pxmconv); % Conversion factor for px to m
+
+% Convert position vectors to m
+RxPos = RxPos.*px_mConv;
+RyPos = RyPos.*px_mConv;
+
+GxPos = GxPos.*px_mConv;
+GyPos = GyPos.*px_mConv;
+
+BxPos = BxPos.*px_mConv;
+ByPos = ByPos.*px_mConv;
+
+YxPos = YxPos.*px_mConv;
+YyPos = YyPos.*px_mConv;
+
+% figure; %Four-bar position at very start of video
+% plot(GxPos(1), GyPos(1), 'g.', ...
+%                 RxPos(1), RyPos(1), 'r.', ...
+%                 BxPos(1), ByPos(1), 'c.', ...
+%                 YxPos(1), YyPos(1), 'y.', ...
+%                 [GxPos(1), YxPos(1)], [GyPos(1), YyPos(1)], ...
+%                 [YxPos(1), BxPos(1)], [YyPos(1), ByPos(1)],  ...
+%                 [BxPos(1), RxPos(1)], [ByPos(1), RyPos(1)], ...
+%                 [RxPos(1), GxPos(1)], [RyPos(1), GyPos(1)], ...
+%                 'LineWidth', 1, ...
+%                 'MarkerSize', 20)
+% title("Starting Position")
+
+% Convert videoframe1 r vectors units to m
+r1Vec = r1Vec.*px_mConv;
+r2Vec = r2Vec.*px_mConv;
+r3Vec = r3Vec.*px_mConv;
+r4Vec = r4Vec.*px_mConv;
+
+% +x axis to find videoframe1 angles 
+xAxisVec = [1, 0];
+xAxisMag = vecnorm(xAxisVec);
+
+% Angles in radians
+th1 = (2*pi) - acos(dot(r1Vec, xAxisVec) ./ (r1 .* xAxisMag)); %adjusted so angle is in CCW direction
+th2 = acos(dot(r2Vec, xAxisVec) ./ (r2 .* xAxisMag));
+th3 = acos(dot(r3Vec, xAxisVec) ./ (r3 .* xAxisMag));
+th4 = acos(dot(r4Vec, xAxisVec) ./ (r4 .* xAxisMag)); 
+
+
+%% Q5: Stick Figure Video
 
 t = (length(frameStart:frameStop))/vid.FrameRate;
     tLin = linspace(0, t, length(frameStart:frameStop));
@@ -161,10 +228,9 @@ for k = frameStart:frameStop
 
         legend('Hip', 'Knee', 'Foot', 'Bottom Bracket', 'Frame (r1)', ...
             'Pedal (r2)', 'Leg (r3)', 'Thigh (r4)', 'Location','eastoutside')
-        xlim([0, col])
-        ylim([0, row])
-        set(gca, 'XTick', [], 'YTick', [])
-        pbaspect([1, row/col, 1])
+        xlim([0, col*px_mConv])
+        ylim([0, row*px_mConv])
+        pbaspect([1, row/col, 1])  
 
     drawnow % forces figure to appear, which may not happen in loops 
 
