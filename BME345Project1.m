@@ -160,13 +160,8 @@ A = [1    0     1    0    0    0    0     0    0    0    0    0    0;
      0    0     0    0    0    0    0     1    0    1    0    0    0];
 
 % % %Right hand side of the equation/ known variables
-% % % Note to self: need to fix Ta
-if (any(th2new) >= pi && any(th2new) <= 3*pi/2) || (any(th2new) >= 5*pi/2 && any(th2new) <= 3*pi)
-b = [m2.*al2x(k) (m2.*al2y(k) - m2*g) (I2y*al2) m3.*al3x(k) (m3.*al3y(k) - m3*g) I3.*al3(k) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k) - Ta) 0 0 0 0]';
+b = [m2.*al2x(k) (m2.*al2y(k) - m2*g) (I2y*al2) m3.*al3x(k) (m3.*al3y(k) - m3*g) I3.*al3(k) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k) - Thip(k)) 0 0 0 0]';
 
-else 
-b = [m2.*al2x(k) (m2.*al2y(k) - m2*g) (I2y*al2) m3.*al3x(k) (m3.*al3y(k) - m3*g) I3.*al3(k) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k)) 0 0 0 0]';
-end
 % % % solving the system of Equations
 F(:,k)= A\b;
 
