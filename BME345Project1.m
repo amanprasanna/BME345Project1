@@ -132,12 +132,12 @@ for k = 1:length(th2new)
     al2x(k) = 0 - (om2new(k).^2).*(r2/2).*cos(th2new(k)); 
     al2y(k) = 0 - (om2new(k).^2).*(r2/2).*sin(th2new(k)); 
     
-    al3x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
-    al3y(k) = (0 - (om2new(k)^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
+    al3x(k) = (0 - (om2new(k).^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2new(k)^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
     
-    al4x(k) = (0 - (om2new(k).^2).*(r2/2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))) ...
+    al4x(k) = (0 - (om2new(k).^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
     + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
-    al4y(k) = (0 - (om2new(k).^2).*(r2/2).*sin(th2new(k))) + (al3(k).*(r3/2).*cos(th3(k)) - (om3(k)^2).*(r3/2).*sin(th3(k))) ...
+    al4y(k) = (0 - (om2new(k).^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
     + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
 
 end
