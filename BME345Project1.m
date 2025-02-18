@@ -95,9 +95,7 @@ options = optimoptions('fsolve','Display','final');
 
 % Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
 for k = 1:integerArray
-    current_om2 = sqrt((om2^2) + 2*al2*(th2new(k)-th2new(1))); % need a new initial acceleration velocity
-    om2new(k) = current_om2;
-    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2new(k),al2);
+    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2,al2);
     %
     % Redefine the guess as the recently solved parameters
     guess = [ans(1) ans(2) ans(3) ans(4) ans(5) ans(6)];
@@ -129,15 +127,15 @@ for k = 1:length(th2new)
     r14x(k) = (r4*thighProximal).*cos(th4(k)); 
     r14y(k) = (r4*thighProximal).*sin(th4(k));
 
-    al2x(k) = 0 - (om2new(k).^2).*(r2/2).*cos(th2new(k)); 
-    al2y(k) = 0 - (om2new(k).^2).*(r2/2).*sin(th2new(k)); 
+    al2x(k) = 0 - (om2).*(r2/2).*cos(th2new(k)); 
+    al2y(k) = 0 - (om2).*(r2/2).*sin(th2new(k)); 
     
-    al3x(k) = (0 - (om2new(k).^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
-    al3y(k) = (0 - (om2new(k)^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
+    al3x(k) = (0 - (om2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
     
-    al4x(k) = (0 - (om2new(k).^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
+    al4x(k) = (0 - (om2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
     + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
-    al4y(k) = (0 - (om2new(k).^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
+    al4y(k) = (0 - (om2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
     + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
 
 end
@@ -192,7 +190,7 @@ legend("\theta_2","\theta_3","\theta_4")
 
 subplot(3,1,2)
 plot(th2new,th3,"b")
-plot(th2new,om2new,"r",th2new,om3,"b",th2new,om4,"g","LineWidth",1.5)
+plot(th2new,om2,"r",th2new,om3,"b",th2new,om4,"g","LineWidth",1.5)
 title("\omega_2 \omega_3 \omega_4 vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("\omega_2, \omega_3, and \omega_4 in rads/s")
