@@ -165,11 +165,6 @@ for k = frameStart:frameStop
         ylim([0, row])
         set(gca, 'XTick', [], 'YTick', [])
         pbaspect([1, row/col, 1])
-        % ADD STATIC BACKGROUND IMAGE
-        % hold on 
-        % I = imread('____.png');
-        % h = image(xlim, -ylim, I);
-        % uistack(h, 'bottom');
 
     drawnow % forces figure to appear, which may not happen in loops 
 
