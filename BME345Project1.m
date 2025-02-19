@@ -339,19 +339,6 @@ YyPos = YyPos.*px_mConv;
 t = (length(frameStart:frameStop))/vid.FrameRate;
     tLin = linspace(0, t, length(frameStart:frameStop));
 
-% Force at each joint in N
-% fGx = ;
-% fGy = ;
-% 
-% fRx = ;
-% fRy = ;
-% 
-% fBx = ;
-% fBy = ;
-% 
-% fYx = ;
-% fYy = ;
-
 vidObj2 = VideoWriter("cycling");
 vidObj2.FrameRate = vid.FrameRate; % set frame rate (e.g., 15)
 open(vidObj2) % opens video for recording 
@@ -373,35 +360,19 @@ for k = frameStart:frameStop
                 [YxPos(1), BxPos(h)], [YyPos(1), ByPos(h)],  ...
                 [BxPos(h), RxPos(h)], [ByPos(h), RyPos(h)], ...
                 [RxPos(h), GxPos(1)], [RyPos(h), GyPos(1)], ...
-                1/2*(GxPos(1)+YxPos(1)), 1/2*(GyPos(1)+YyPos(1)), '.', ...
-                1/2*(YxPos(1)+BxPos(h)), 1/2*(YyPos(1)+ByPos(h)), '.', ...
-                lowerlegProximal*(BxPos(h)+RxPos(h)), lowerlegProximal*(ByPos(h)+RyPos(h)), '.', ...
-                thighProximal*(RxPos(h)+GxPos(1)), thighProximal*(RyPos(h)+GyPos(1)), '.', ...
                 RxPos, RyPos, 'r-', ...
                 'LineWidth', 1, ...
                 'MarkerSize', 20)
-            
-            % CAN ADD FORCE ARROWS HERE
-            % hold on
-            % quiver(RxPos(h), RyPos(h), fRx(h), fRy(h), .1, "Color", "r", ...
-            %     "LineWidth", 2, "MaxHeadSize", 1)
-            % quiver(GxPos(h), GyPos(h), fGx(h), fGy(h), .1, "Color", "g", ...
-            %     "LineWidth", 2, "MaxHeadSize", 1)
-            % quiver(BxPos(h), ByPos(h), fBx(h), fBy(h), .1, "Color", "c", ...
-            %     "LineWidth", 2, "MaxHeadSize", 1)
-            % quiver(YxPos(h), YyPos(h), fYx(h), fYy(h), .1, "Color", "y", ...
-            %     "LineWidth", 2, "MaxHeadSize", 1)
-            % hold off
         end
         title('Pedaling System')
         xlabel('Horizontal Position (m)')
         ylabel('Vertical Position (m)') 
         legend('Hip', 'Knee', 'Foot', 'Bottom Bracket', 'Frame (r1)', ...
-            'Pedal (r2)', 'Leg (r3)', 'Thigh (r4)', 'r1 CoM','r2 CoM', 'r3 CoM', ...
-            'r4 CoM', 'Knee Pathway', 'Location','eastoutside')
+            'Pedal (r2)', 'Leg (r3)', 'Thigh (r4)', ...
+            'Knee Pathway', 'Location', 'eastoutside')
         xlim([0, col*px_mConv])
         ylim([0, row*px_mConv])
-        pbaspect([1, row/col, 1])  
+        pbaspect([1, row/col, 1]) 
         
 
     drawnow % forces figure to appear, which may not happen in loops
