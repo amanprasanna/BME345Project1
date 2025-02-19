@@ -94,7 +94,7 @@ options = optimoptions('fsolve','Display','final');
 % Video Info
 vidFile = 'Bike_Mirrored.mov';
 frameStart = 62; 
-frameStop = 110; 
+frameStop = 109; 
 vid = VideoReader(vidFile);
 
 % Figure Background
