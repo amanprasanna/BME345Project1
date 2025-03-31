@@ -6,19 +6,31 @@ clear
 clc
 close all
 
-%% Declarations
+%% Declarations (Adkin's updated given below)
 
-% Total mass
-m = 65.0; %(kg)
+m = 75; % total mass of cyclist (kg)
+g = -9.81; % gravity (m/s^2)
+numRev = 3; % number of revolutions
 
-%Gravity
-g = -9.81; %m/s^2
+% Conversions
+in2m = 0.0254; % Converts inches to meters
 
-% Lengths (m)
-r1 = 0.665; %hip to bike pedal
-r2 = 0.185; %bike pedal to foot
-r3 = 0.44; %foot to knee 
-r4 = 0.51; %knee to hip
+% Bike info
+seatHeight = 15*in2m; % height from crank to seat (m)
+seatLength = 17*in2m; % horizontal distance from crank to seat (m)
+m2 = 0.5; % pedal mass (kg)
+h2 = 1*in2m; % pedal height (m)
+
+% Dimensions
+r1 = sqrt(seatHeight^2+seatLength^2);
+r2 = 4*in2m;
+r3 = 21*in2m;
+r4 = 19*in2m;
+
+% Link 1 (frame) kinematics
+th1 = -pi/2 - atan(seatLength/seatHeight);
+om1 = 0;
+al1 = 0;
 
 % Distal Distances
 thighDistal = 0.567; 
@@ -58,7 +70,6 @@ Ta = 125; %N*m
 th2 = pi; %rads
 om2 = 1; %rad/s
 al2 = 0; %rad/s^2
-th1 = (260*pi)/180; %rads
 
 % Forces Due to Gravity
 F1g = m1*g; %N
