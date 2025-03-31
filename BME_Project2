@@ -1,0 +1,182 @@
+% BME 345 Project 2
+% Jasmine, John, Aman, Mylah
+% Due: April 15, 2025
+
+clear
+clc
+close all
+
+%% Declarations
+
+% Total mass
+m = 65.0; %(kg)
+
+%Gravity
+g = -9.81; %m/s^2
+
+% Lengths (m)
+r1 = 0.665; %hip to bike pedal
+r2 = 0.185; %bike pedal to foot
+r3 = 0.44; %foot to knee 
+r4 = 0.51; %knee to hip
+
+% Distal Distances
+thighDistal = 0.567; 
+thighProximal = 0.433; 
+
+lowerlegDistal = 0.433; 
+lowerlegProximal = 0.567; 
+
+% Link information (might not need these)
+pHuman = 985; %density (kg/m^3)
+pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
+diameterR1 = 0.102; % diameter of frame 1 on the bike (cm to m)
+lengthCrank = 0.21; % m
+heightCrank = .03; %m
+width = .005; %m
+
+
+% Mass of Links (kg)
+m1 = 1.0; % frame mass approximation
+m2 = .168 + .698; % pedal + pedal crank (kg)
+m3 = 0.0465*m; % leg (no foot) using anthropometric table
+m4 = 0.100*m; % thigh (hip to knee) using anthropometric table
+
+% Radius of Gyration (w.r.t CoG) of Links
+k1 = diameterR1 / sqrt(2); %hip to bike pedal
+k2 = heightCrank / sqrt(12); %bike pedal to lower leg (assume center to bike pedal is a rectangular prism...need to take measurements on this)
+k3 = 0.302; %foot and leg (from anthropometric table)
+k4 = 0.323; %thigh (from anthropometric table)
+
+% Moments of Inertia (kg*m^2)
+I2z = m*(lengthCrank^2 + heightCrank^2) / 12; % rectangular prism
+I3 = m3*k3^2;
+I4 = m4*k4^2;
+
+% Crank Inputs if any
+Ta = 125; %N*m
+th2 = pi; %rads
+om2 = 1; %rad/s
+al2 = 0; %rad/s^2
+th1 = (260*pi)/180; %rads
+
+% Forces Due to Gravity
+F1g = m1*g; %N
+F2g = m2*g; %N
+F3g = m3*g; %N
+F4g = m4*g; %N
+
+
+% Steps 
+stepSize = pi/36; 
+maxRev = 7*pi; (changed max here)
+th2new = th2:stepSize:maxRev; 
+
+integerArray = numel(th2new);
+
+% T hip
+Thip = ones(1,length(th2new)); 
+[~, indexT0] = min(abs(th2new - (3*pi/2))); 
+[~, indexT1] = min(abs(th2new - (5*pi/2))); 
+
+Thip = Thip*Ta; 
+Thip(indexT0:indexT1) = 0; 
+
+% Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
+guess = [(pi/2) (pi/4) 1 1 1 1];
+options = optimoptions('fsolve','Display','final'); 
+
+%% Calculations
+
+% Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
+for k = 1:integerArray
+    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2,al2);
+    %
+    % Redefine the guess as the recently solved parameters
+    guess = [ans(1) ans(2) ans(3) ans(4) ans(5) ans(6)];
+    %
+    % Record newly calculated parameters in a vector or matrix.
+    th3(k) = ans(1);
+    th4(k) = ans(2);
+    om3(k) = ans(3);
+    om4(k) = ans(4);
+    al3(k) = ans(5);
+    al4(k) = ans(6);
+    
+end
+
+% Finding the x and y positions and al components based on th2, th3, and th4
+for k = 1:length(th2new)
+    r12x(k) = -(r2/2).*cos(th2new(k)); % assume symmetrical pedal crank
+    r12y(k) = -(r2/2).*sin(th2new(k)); 
+    r32x(k) = (r2/2).*cos(th2new(k)); 
+    r32y(k) = (r2/2).*sin(th2new(k)); 
+    
+    r23x(k) = -(r3*lowerlegDistal).*cos(th3(k)); % lower leg cannot be divided by 2
+    r23y(k) = -(r3*lowerlegDistal).*sin(th3(k)); 
+    r43x(k) = (r3*lowerlegProximal).*cos(th3(k)); 
+    r43y(k) = (r3*lowerlegProximal).*sin(th3(k)); 
+
+    r34x(k) = -(r4*thighDistal).*cos(th4(k)); % thigh cannot be divided by 2 
+    r34y(k) = -(r4*thighDistal).*sin(th4(k));
+    r14x(k) = (r4*thighProximal).*cos(th4(k)); 
+    r14y(k) = (r4*thighProximal).*sin(th4(k));
+
+    al2x(k) = 0 - (om2^2).*(r2/2).*cos(th2new(k)); 
+    al2y(k) = 0 - (om2^2).*(r2/2).*sin(th2new(k)); 
+    
+    al3x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
+    
+    al4x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
+    + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
+    al4y(k) = (0 - (om2^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
+    + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
+
+end
+
+
+% Solving for the Force Components
+%  F12x  F12y  F32x F32y F23x F23y F43x F43y F34x  F34y F14x F14y  TD
+for k = 1:length(al4y)
+A = [1    0     1    0    0    0    0     0    0    0    0    0    0; 
+     0    1     0    1    0    0    0     0    0    0    0    0    0;
+ -r12y(k)' r12x(k)' -r32y(k)' r32x(k)'  0     0    0    0    0    0    0    0    1; % torque to solve is T2
+     0    0     0    0    1    0    1     0    0    0    0    0    0;
+     0    0     0    0    0    1    0     1    0    0    0    0    0;
+     0    0     0    0  -r23y(k)' r23x(k)' -r43y(k)' r43x(k)'  0    0    0    0    0;
+     0    0     0    0    0    0    0     0    1    0    1    0    0;
+     0    0     0    0    0    0    0     0    0    1    0    1    0;
+     0    0     0    0    0    0    0     0  -r34y(k)' r34x(k)' -r14y(k)' r14x(k)' 0;
+     0    0     1    0    1    0    0     0    0    0    0    0    0;
+     0    0     0    1    0    1    0     0    0    0    0    0    0;
+     0    0     0    0    0    0    1     0    1    0    0    0    0;
+     0    0     0    0    0    0    0     1    0    1    0    0    0];
+
+% Right hand side of the equation/ known variables
+b = [m2.*al2x(k) (m2.*al2y(k) - m2*g) (I2z*al2) m3.*al3x(k) (m3.*al3y(k) - m3*g) I3.*al3(k) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k) - Thip(k)) 0 0 0 0]';
+
+F(:,k)= A\b;
+
+end
+
+% Solving for Thigh Force Components at the Knee to Graph 
+FKneeParallel = F(3, :).*cos(th4) + F(4,:).*sin(th4); % force of the knee in x direction (N)
+FKneePerpendicular = F(3, :).*cos(th4 + (pi/2)) + F(4,:).*sin(th4 + (pi/2)); % force of the knee in y direction (N)
+
+
+%% Graph of Angle 2 vs. Torque of Pedal and Hips
+figure(1)
+plot(th2new,Thip,"r",th2new,F(end, :),"b","LineWidth",1.5)
+title("Torque at the Pedal and Hips vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("Torque (N*m)")
+legend("Torque of Hips","Torque of Pedals")
+
+%% Graph of the Force Components vs. Angle 2
+figure(2)
+plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
+title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("Force (N)")
+legend("Force Parallel to Knee","Force Perpendicular to Knee")
