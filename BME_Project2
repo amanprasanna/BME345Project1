@@ -69,7 +69,7 @@ F4g = m4*g; %N
 
 % Steps 
 stepSize = pi/36; 
-maxRev = 7*pi; (changed max here)
+maxRev = 7*pi; % (changed max here)
 th2new = th2:stepSize:maxRev; 
 
 integerArray = numel(th2new);
