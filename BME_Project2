@@ -7,6 +7,7 @@ clc
 close all
 
 %% Declarations (Adkin's updated given below)
+% Need to check if we can use our givens or have to figure out torque by Adkin's given declarations
 
 m = 75; % total mass of cyclist (kg)
 g = -9.81; % gravity (m/s^2)
