@@ -176,6 +176,18 @@ end
 FKneeParallel = F(3, :).*cos(th4) + F(4,:).*sin(th4); % force of the knee in x direction (N)
 FKneePerpendicular = F(3, :).*cos(th4 + (pi/2)) + F(4,:).*sin(th4 + (pi/2)); % force of the knee in y direction (N)
 
+% Solving for Thigh Force Components at the Knee to Graph 
+FKneeParallel = F(3, :).*cos(th4) + F(4,:).*sin(th4); % force of the knee in x direction (N)
+FKneePerpendicular = F(3, :).*cos(th4 + (pi/2)) + F(4,:).*sin(th4 + (pi/2)); % force of the knee in y direction (N)
+Area = 133;
+normStress = FKneePerpendicular/Area;
+shearStress = FKneeParallel/ Area;
+principalStress = -2.27e6;
+E = 114000; % Elastic Modulus(MPa)
+G = 45000; % Shear Modulus(MPa)
+normStrain = (normStress/E);
+shearStrain = (shearStress/G);
+principalStrain = -2e-5;
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips
 figure(1)
@@ -192,3 +204,74 @@ title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Force (N)")
 legend("Force Parallel to Knee","Force Perpendicular to Knee")
+
+%% Graph of Normal/Shear/max Principle Stress on knee
+
+figure(3)
+
+% Normal plot
+subplot(3,1,1)
+plot(th2new, normStress, 'r-',"LineWidth",1.5)
+title('Normal Stress vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\sigma (MPa)')
+legend('Normal Stress', 'Location', 'eastoutside')
+grid on
+
+% Shear plot
+subplot(3,1,2)
+plot(th2new, shearStress, 'r-', "LineWidth",1.5)
+title('Shear Stress vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\tau (MPa)')
+legend('Shear Stress', 'Location', 'eastoutside')
+grid on
+
+% Maximum principle plot
+subplot(3,1,3)
+plot(th2new, principalStress, 'r-',"LineWidth",1.5)
+title('Maximum Principal Stress vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\sigma_m_a_x (MPa)')
+legend('\sigma_3', 'Location', 'eastoutside')
+grid on
+
+% Adjust subplot spacing
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
+
+%% Graph of Normal/Shear/max Principle Strain on knee
+
+figure(4)
+
+% Normal plot
+subplot(3,1,1)
+plot(th2new, normStrain, 'r-', "LineWidth",1.5)
+title('Normal Strain vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\epsilon_\sigma (MPa)')
+legend('Normal Strain', 'Location', 'eastoutside')
+grid on
+
+% Shear plot
+subplot(3,1,2)
+plot(th2new, shearStrain, 'r-', "LineWidth",1.5)
+title('Shear Strain vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\epsilon_3 (MPa)')
+legend('Shear Strain', 'Location', 'eastoutside')
+grid on
+
+% Maximum principle plot
+subplot(3,1,3)
+plot(th2new, principalStrain, 'r-', "LineWidth",1.5)
+title('Maximum Principal Strain vs. \theta_2')
+xlabel('\theta_2 (rad)')
+ylabel('\epsilon_3 (MPa)')
+legend('\epsilon_3', 'Location', 'eastoutside')
+grid on
+
+% Adjust subplot spacing
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
+
