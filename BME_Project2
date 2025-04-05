@@ -258,7 +258,7 @@ subplot(3,1,2)
 plot(th2new, shearStrain, 'r-', "LineWidth",1.5)
 title('Shear Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
-ylabel('\epsilon_3 (MPa)')
+ylabel('\gamma (MPa)')
 legend('Shear Strain', 'Location', 'eastoutside')
 grid on
 
