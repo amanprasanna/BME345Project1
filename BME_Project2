@@ -19,6 +19,17 @@ r2 = 4*in2m;
 r3 = 21*in2m;
 r4 = 19*in2m;
 
+stemRadius = 7*10^-3; %Radius of tibial stem (m)
+%Sources:
+% https://www.amplitude-ortho.com/assets/documents/products/cc936-anatomic-st-4-in-1-conv-common-knee-instrumentation-to.g.051-en-c.pdf
+% https://www.link-ortho.com/fileadmin/user_upload/Fuer_den_Arzt/Produkte/Downloads/EN/719_MIRETO_OP_RevisionOP_en_2020-09_007.pdf
+stemCrossArea = 3.14 * stemRadius^2;
+
+% Titanium Alloy (Ti-6Al-4V) Properties
+E_Ti = 113.8; %Elastic Modulus (MPa)
+v_Ti = 0.34; %Poisson's Ratio
+G_Ti = 42.4; %Rigidity Modulus (GPa)
+
 % Link 1 (frame) kinematics
 th1 = -pi/2 - atan(seatLength/seatHeight);
 om1 = 0;
@@ -170,6 +181,24 @@ title("Torque at the Pedal and Hips vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Torque (N*m)")
 legend("Torque of Hips","Torque of Pedals")
+
+%% Calculating Normal/Shear/max Principal Stress on Stem
+% Using the force at the knee, calculate separately the normal and shear stress in the tibial stem. Also calculate the strain.
+
+% Assumtpions:
+% normal stress along the stem is ONLY from the normal knee force
+% shear stress in the stem is ONLY from the shear force at the knee
+
+% Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
+% to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane). 
+
+normStress = FKneePerpendicular./stemCrossArea;
+shearStress = FKneeParallel./stemCrossArea;
+% principalStress = ;
+ 
+normStrain = normStress./E_Ti;
+shearStrain = shearStress./G_Ti;
+% principalStrain = ;
 
 %% Graph of the Force Components vs. Angle 2
 figure(2)
