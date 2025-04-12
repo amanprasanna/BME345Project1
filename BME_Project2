@@ -89,6 +89,10 @@ th2new = th2:stepSize:maxRev;
 
 integerArray = numel(th2new); 
 
+% Modulus constants
+E_Ti = 120e12; %MPa
+G_Ti = 45e12; %MPa
+
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
 guess = [(pi/2) (pi/4) 1 1 1 1];
 options = optimoptions('fsolve','Display','final'); 
