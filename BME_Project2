@@ -197,6 +197,11 @@ legend("Force Parallel to Knee","Force Perpendicular to Knee")
 % Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
 % to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane). 
 
+proxKneeWidth = .004; %(m)
+stemWidth = proxKneeWidth/3;
+stemCrossArea = pi*(stemWidth/2)^2;
+
+
 normStress = FKneePerpendicular./stemCrossArea;
 shearStress = FKneeParallel./stemCrossArea;
 % principalStress = ;
