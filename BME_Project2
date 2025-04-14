@@ -86,10 +86,9 @@ F4g = m4*g; %N
 
 
 % Steps 
-stepSize = lengthF32y; 
 minRev = pi;
 maxRev = 7*pi; % (changed max here)
-th2 = linspace(minRev, maxRev, stepSize); 
+th2 = linspace(minRev, maxRev, lengthF32y); 
 
 integerArray = numel(th2); 
 
