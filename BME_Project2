@@ -27,6 +27,17 @@ r2 = 4*in2m;
 r3 = 21*in2m;
 r4 = 19*in2m;
 
+stemRadius = 7*10^-3; %Radius of tibial stem (m)
+%Source:
+% https://www.link-ortho.com/fileadmin/user_upload/Fuer_den_Arzt/Produkte/Downloads/EN/719_MIRETO_OP_RevisionOP_en_2020-09_007.pdf
+stemCrossArea = 3.14 * stemRadius^2;
+
+% Titanium Alloy (Ti-6Al-4V) Properties
+E_Ti = 113.8; %Elastic Modulus (MPa)
+v_Ti = 0.34; %Poisson's Ratio
+G_Ti = 42.4; %Rigidity Modulus (GPa)
+
+
 % Link 1 (frame) kinematics
 th1 = -pi/2 - atan(seatLength/seatHeight);
 om1 = 0;
@@ -40,7 +51,6 @@ lowerlegDistal = 0.433;
 lowerlegProximal = 0.567; 
 
 % Link information (might not need these)
-pHuman = 985; %density (kg/m^3)
 pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
 diameterR1 = 0.102; % diameter of frame 1 on the bike (cm to m)
 lengthCrank = 0.21; % m
@@ -51,49 +61,44 @@ width = .005; %m
 importF32y = xlsread("f32y.csv"); 
 F32y = importF32y(:,2)';
 F23y = -F32y; 
+lengthF32y = length(importF32y);
+duration = importF32y(end,1) - importF32y(1,1); %would prefer to use end here
+
 
 % Mass of Links (kg)
-massL1 = 1.0; % frame mass approximation
-massL2 = .168 + .698; % pedal + pedal crank (kg)
-massL3 = 0.0465*m; % leg (no foot) using anthropometric table
-massL4 = 0.100*m; % thigh (hip to knee) using anthropometric table
+m1 = 1.0; % frame mass approximation
+m3 = 0.0465*m; % leg (no foot) using anthropometric table
+m4 = 0.100*m; % thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
-k1 = diameterR1 / sqrt(2); %hip to bike pedal
-k2 = heightCrank / sqrt(12); %bike pedal to lower leg (assume center to bike pedal is a rectangular prism...need to take measurements on this)
 k3 = 0.302; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
 % Moments of Inertia (kg*m^2)
 I2z = m*(lengthCrank^2 + heightCrank^2) / 12; % rectangular prism
-I3 = massL3*k3^2;
-I4 = massL4*k4^2;
+I3 = m3*k3^2;
+I4 = m4*k4^2;
 
-% Crank Inputs if any
-Ta = 125; %N*m
-t = F32y(:,1);%s
-th2 = pi; %rads
-om2 = ((6*pi)/t); %rad/s
-al2 = 0; %rad/s^2
 
 % Forces Due to Gravity
-F1g = massL1*g; %N
-F2g = massL2*g; %N
-F3g = massL3*g; %N
-F4g = massL4*g; %N
+F1g = m1*g; %N
+F2g = m2*g; %N
+F3g = m3*g; %N
+F4g = m4*g; %N
 
 
 % Steps 
-stepSize = pi/29; 
-
+stepSize = lengthF32y; 
+minRev = pi;
 maxRev = 7*pi; % (changed max here)
-th2new = th2:stepSize:maxRev; 
+th2 = linspace(minRev, maxRev, stepSize); 
 
-integerArray = numel(th2new); 
+integerArray = numel(th2); 
 
-% Modulus constants
-E_Ti = 120e12; %MPa
-G_Ti = 45e12; %MPa
+% Crank Inputs if any
+om2 = (maxRev - minRev) / duration; %rad/s
+al2 = 0; %rad/s^2
+
 
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
 guess = [(pi/2) (pi/4) 1 1 1 1];
@@ -102,7 +107,7 @@ options = optimoptions('fsolve','Display','final');
 %% Calculations
 
 % Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
-for k = 1:integerArray
+for k = 1:lengthF32y
     ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2,al2);
     %
     % Redefine the guess as the recently solved parameters
@@ -166,7 +171,7 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
      0    0     0    0    0    0    1     0    1    0    0    0];
 
 % Right hand side of the equation/ known variables
-b = [massL2.*al2x(k) (massL2.*al2y(k) - massL2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) massL3.*al3x(k) (massL3.*al3y(k) - massL3*g - F23y(k)) (I3.*al3(k) - r23x(k).*F23y(k)) massL4.*al4x(k) (massL4.*al4y(k) - massL4*g) (I4.*al4(k)) 0 0 0]';
+b = [m2.*al2x(k) (m2.*al2y(k) - m2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) massL3.*al3x(k) (massL3.*al3y(k) - massL3*g - F23y(k)) (I3.*al3(k) - r23x(k).*F23y(k)) massL4.*al4x(k) (massL4.*al4y(k) - massL4*g) (I4.*al4(k)) 0 0 0]';
 
 F(:,k)= A\b;
 
