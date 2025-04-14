@@ -217,7 +217,7 @@ for j = 1:length(normStress)
     principalStress(j) = max(eig(stressMatrix)); 
 
     strainMatrix = [0 shearStrain(j); shearStrain(j) normStrain(j)]; 
-    principalStrain(j) = max(eig(strainMatrix));
+    principalStrain(j) = max(eig(strainMatrix)); % Strain in z direction needs to be found
 end
 
 %% Graph of the Force Components vs. Angle 2
