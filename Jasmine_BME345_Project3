@@ -177,8 +177,8 @@ F(:,k)= A\b;
 end
 
 % Solving for Knee Force Components at the Knee to Graph (F43)
-FKneeParallel = F(8, :).*cos(th3) + F(9,:).*sin(th3); % force of the knee in x direction (N)
-FKneePerpendicular = F(8, :).*cos(th3 + (pi/2)) + F(9,:).*sin(th3 + (pi/2)); % force of the knee in y direction (N)
+FKneeParallel = F(6, :).*cos(th3) + F(7,:).*sin(th3); % force of the knee in x direction (N)
+FKneePerpendicular = F(6, :).*cos(th3 + (pi/2)) + F(7,:).*sin(th3 + (pi/2)); % force of the knee in y direction (N)
 
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips (ensure that this is accurate)
@@ -212,13 +212,13 @@ stemWidth = proxKneeWidth/3;
 stemCrossArea = pi*(stemWidth/2)^2;
 
 
-normStress = ((FKneePerpendicular./stemCrossArea)/10);
-shearStress = ((FKneeParallel./stemCrossArea)/100);
+normStress = FKneePerpendicular./stemCrossArea;
+shearStress = FKneeParallel./stemCrossArea;
 
-normYStrain = (normStress./E_Ti)*100;
-normXStrain = (-(v_Ti)*normYStrain)*10; 
-normZStrain = (-(v_Ti)*normXStrain)*10; 
-shearXYStrain = (shearStress./G_Ti)*10;
+normYStrain = normStress./E_Ti;
+normXStrain = -(v_Ti)*normYStrain; 
+normZStrain = -(v_Ti)*normXStrain; 
+shearXYStrain = shearStress./G_Ti;
 
 
 % Strain in z direction needs to be found
