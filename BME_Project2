@@ -75,6 +75,10 @@ th2 = pi; %rads
 om2 = 1; %rad/s
 al2 = 0; %rad/s^2
 
+% Modulus constants
+E_Ti = 120e12; %MPa
+G_Ti = 45e12; %MPa
+
 % Forces Due to Gravity
 F1g = m1*g; %N
 F2g = m2*g; %N
@@ -88,10 +92,6 @@ maxRev = 7*pi; % (changed max here)
 th2new = th2:stepSize:maxRev; 
 
 integerArray = numel(th2new); 
-
-% Modulus constants
-E_Ti = 120e12; %MPa
-G_Ti = 45e12; %MPa
 
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
 guess = [(pi/2) (pi/4) 1 1 1 1];
@@ -155,7 +155,7 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
 -r12y(k)' r12x(k)' -r32y(k)'  1  0  0    0    0    0    0    0 0; 
      0    0     0    0    1    1     0    0    0    0    0    0;
      0    0     0    0    0    0     1    0    0    0    0    0;
-     0    0     0    0  -r23y(k)' r23x(k)' -r43y(k)' r43x(k)'  0    0    0    0;
+     0    0     0    0  -r23y(k)' -r43y(k)' r43x(k)'  0    0    0    0 0;
      0    0     0    0    0    0    0     1    0    1    0    0;
      0    0     0    0    0    0    0     0    1    0    1    0;
      0    0     0    0    0    0    0  -r34y(k)' r34x(k)' -r14y(k)' r14x(k)' 1;
@@ -170,7 +170,7 @@ F(:,k)= A\b;
 
 end
 
-% Solving for Knee Force Components at the Knee to Graph (F34)
+% Solving for Knee Force Components at the Knee to Graph (F43)
 FKneeParallel = F(8, :).*cos(th3) + F(9,:).*sin(th3); % force of the knee in x direction (N)
 FKneePerpendicular = F(8, :).*cos(th3 + (pi/2)) + F(9,:).*sin(th3 + (pi/2)); % force of the knee in y direction (N)
 
@@ -209,24 +209,19 @@ stemCrossArea = pi*(stemWidth/2)^2;
 normStress = FKneePerpendicular./stemCrossArea;
 shearStress = FKneeParallel./stemCrossArea;
 
-normStrain = normStress./E_Ti;
+% normXStrain = ;
+normYStrain = normStress./E_Ti;
 shearStrain = shearStress./G_Ti;
+
+% Strain in z direction needs to be found
 
 for j = 1:length(normStress)
     stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
     principalStress(j) = max(eig(stressMatrix)); 
 
-    strainMatrix = [0 shearStrain(j); shearStrain(j) normStrain(j)]; 
-    principalStrain(j) = max(eig(strainMatrix)); % Strain in z direction needs to be found
+    strainMatrix = [0 shearStrain(j); shearStrain(j) normYStrain(j)]; 
+    principalStrain(j) = max(eig(strainMatrix));
 end
-
-%% Graph of the Force Components vs. Angle 2
-figure(2)
-plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
-title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
-xlabel("\theta_2 in radians")
-ylabel("Force (N)")
-legend("Force Parallel to Knee","Force Perpendicular to Knee")
 
 %% Graph of Normal/Shear/max Principle Stress on knee
 
@@ -269,7 +264,7 @@ figure(4)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normStrain, 'r-', "LineWidth",1.5)
+plot(th2new, normYStrain, 'r-', "LineWidth",1.5)
 title('Normal Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\epsilon_\sigma (MPa)')
@@ -297,4 +292,3 @@ grid on
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
 set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
-
