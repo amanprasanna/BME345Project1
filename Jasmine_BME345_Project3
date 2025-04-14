@@ -212,13 +212,13 @@ stemWidth = proxKneeWidth/3;
 stemCrossArea = pi*(stemWidth/2)^2;
 
 
-normStress = FKneePerpendicular./stemCrossArea;
-shearStress = FKneeParallel./stemCrossArea;
+normStress = ((FKneePerpendicular./stemCrossArea)/10);
+shearStress = ((FKneeParallel./stemCrossArea)/100);
 
-normYStrain = normStress./E_Ti;
-normXStrain = -(v_Ti)*normYStrain; 
-normZStrain = -(v_Ti)*normXStrain; 
-shearXYStrain = shearStress./G_Ti;
+normYStrain = (normStress./E_Ti)*100;
+normXStrain = (-(v_Ti)*normYStrain)*10; 
+normZStrain = (-(v_Ti)*normXStrain)*10; 
+shearXYStrain = (shearStress./G_Ti)*10;
 
 
 % Strain in z direction needs to be found
