@@ -208,11 +208,17 @@ stemCrossArea = pi*(stemWidth/2)^2;
 
 normStress = FKneePerpendicular./stemCrossArea;
 shearStress = FKneeParallel./stemCrossArea;
-% principalStress = ;
- 
+
 normStrain = normStress./E_Ti;
 shearStrain = shearStress./G_Ti;
-% principalStrain = ;
+
+for j = 1:length(normStress)
+    stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
+    principalStress(j) = max(eig(stressMatrix)); 
+
+    strainMatrix = [0 shearStrain(j); shearStrain(j) normStrain(j)]; 
+    principalStrain(j) = max(eig(strainMatrix));
+end
 
 %% Graph of the Force Components vs. Angle 2
 figure(2)
