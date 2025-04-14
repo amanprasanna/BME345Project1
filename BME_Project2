@@ -48,15 +48,15 @@ heightCrank = .03; %m
 width = .005; %m
 
 % F32y Given 
-importF32y = xlsread("f32y (1).csv"); 
+importF32y = xlsread("f32y.csv"); 
 F32y = importF32y(:,2)';
 F23y = -F32y; 
 
 % Mass of Links (kg)
-m1 = 1.0; % frame mass approximation
-m2 = .168 + .698; % pedal + pedal crank (kg)
-m3 = 0.0465*m; % leg (no foot) using anthropometric table
-m4 = 0.100*m; % thigh (hip to knee) using anthropometric table
+massL1 = 1.0; % frame mass approximation
+massL2 = .168 + .698; % pedal + pedal crank (kg)
+massL3 = 0.0465*m; % leg (no foot) using anthropometric table
+massL4 = 0.100*m; % thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
 k1 = diameterR1 / sqrt(2); %hip to bike pedal
@@ -66,32 +66,34 @@ k4 = 0.323; %thigh (from anthropometric table)
 
 % Moments of Inertia (kg*m^2)
 I2z = m*(lengthCrank^2 + heightCrank^2) / 12; % rectangular prism
-I3 = m3*k3^2;
-I4 = m4*k4^2;
+I3 = massL3*k3^2;
+I4 = massL4*k4^2;
 
 % Crank Inputs if any
 Ta = 125; %N*m
+t = F32y(:,1);%s
 th2 = pi; %rads
-om2 = 1; %rad/s
+om2 = ((6*pi)/t); %rad/s
 al2 = 0; %rad/s^2
 
-% Modulus constants
-E_Ti = 120e12; %MPa
-G_Ti = 45e12; %MPa
-
 % Forces Due to Gravity
-F1g = m1*g; %N
-F2g = m2*g; %N
-F3g = m3*g; %N
-F4g = m4*g; %N
+F1g = massL1*g; %N
+F2g = massL2*g; %N
+F3g = massL3*g; %N
+F4g = massL4*g; %N
 
 
 % Steps 
 stepSize = pi/29; 
+
 maxRev = 7*pi; % (changed max here)
 th2new = th2:stepSize:maxRev; 
 
 integerArray = numel(th2new); 
+
+% Modulus constants
+E_Ti = 120e12; %MPa
+G_Ti = 45e12; %MPa
 
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
 guess = [(pi/2) (pi/4) 1 1 1 1];
@@ -155,7 +157,7 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
 -r12y(k)' r12x(k)' -r32y(k)'  1  0  0    0    0    0    0    0 0; 
      0    0     0    0    1    1     0    0    0    0    0    0;
      0    0     0    0    0    0     1    0    0    0    0    0;
-     0    0     0    0  -r23y(k)' -r43y(k)' r43x(k)'  0    0    0    0 0;
+     0    0     0    0  -r23y(k)' r23x(k)' -r43y(k)' r43x(k)'  0    0    0    0;
      0    0     0    0    0    0    0     1    0    1    0    0;
      0    0     0    0    0    0    0     0    1    0    1    0;
      0    0     0    0    0    0    0  -r34y(k)' r34x(k)' -r14y(k)' r14x(k)' 1;
@@ -164,13 +166,13 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
      0    0     0    0    0    0    1     0    1    0    0    0];
 
 % Right hand side of the equation/ known variables
-b = [m2.*al2x(k) (m2.*al2y(k) - m2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) m3.*al3x(k) (m3.*al3y(k) - m3*g - F23y(k)) (I3.*al3(k) - r23x(k).*F23y(k)) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k)) 0 0 0]';
+b = [massL2.*al2x(k) (massL2.*al2y(k) - massL2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) massL3.*al3x(k) (massL3.*al3y(k) - massL3*g - F23y(k)) (I3.*al3(k) - r23x(k).*F23y(k)) massL4.*al4x(k) (massL4.*al4y(k) - massL4*g) (I4.*al4(k)) 0 0 0]';
 
 F(:,k)= A\b;
 
 end
 
-% Solving for Knee Force Components at the Knee to Graph (F43)
+% Solving for Knee Force Components at the Knee to Graph (F34)
 FKneeParallel = F(8, :).*cos(th3) + F(9,:).*sin(th3); % force of the knee in x direction (N)
 FKneePerpendicular = F(8, :).*cos(th3 + (pi/2)) + F(9,:).*sin(th3 + (pi/2)); % force of the knee in y direction (N)
 
@@ -201,27 +203,25 @@ legend("Force Parallel to Knee","Force Perpendicular to Knee")
 % Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
 % to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane). 
 
-proxKneeWidth = .004; %(m)
-stemWidth = proxKneeWidth/3;
+proxTibiaWidth = .006; %(m)
+stemWidth = proxTibiaWidth/3;
 stemCrossArea = pi*(stemWidth/2)^2;
-
 
 normStress = FKneePerpendicular./stemCrossArea;
 shearStress = FKneeParallel./stemCrossArea;
-
-% normXStrain = ;
-normYStrain = normStress./E_Ti;
+principalStress3 = 0; % 
+ 
+normStrain = normStress./E_Ti;
 shearStrain = shearStress./G_Ti;
+principalStrain3 = 0;
 
-% Strain in z direction needs to be found
-
-for j = 1:length(normStress)
-    stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
-    principalStress(j) = max(eig(stressMatrix)); 
-
-    strainMatrix = [0 shearStrain(j); shearStrain(j) normYStrain(j)]; 
-    principalStrain(j) = max(eig(strainMatrix));
-end
+%% Graph of the Force Components vs. Angle 2
+figure(2)
+plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
+title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
+xlabel("\theta_2 in radians")
+ylabel("Force (N)")
+legend("Force Parallel to Knee","Force Perpendicular to Knee")
 
 %% Graph of Normal/Shear/max Principle Stress on knee
 
@@ -247,10 +247,10 @@ grid on
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStress, 'r-',"LineWidth",1.5)
+plot(th2new, principalStress3, 'r-',"LineWidth",1.5)
 title('Maximum Principal Stress vs. \theta_2')
 xlabel('\theta_2 (rad)')
-ylabel('\sigma_m_a_x (MPa)')
+ylabel('\sigma_3 (MPa)')
 legend('\sigma_3', 'Location', 'eastoutside')
 grid on
 
@@ -264,7 +264,7 @@ figure(4)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normYStrain, 'r-', "LineWidth",1.5)
+plot(th2new, normStrain, 'r-', "LineWidth",1.5)
 title('Normal Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\epsilon_\sigma (MPa)')
@@ -282,13 +282,16 @@ grid on
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStrain, 'r-', "LineWidth",1.5)
+plot(th2new, principalStrain3, 'r-', "LineWidth",1.5)
 title('Maximum Principal Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\epsilon_3 (MPa)')
 legend('\epsilon_3', 'Location', 'eastoutside')
 grid on
 
+% Adjust subplot spacing
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
 set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
