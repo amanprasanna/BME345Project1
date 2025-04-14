@@ -108,7 +108,7 @@ options = optimoptions('fsolve','Display','final');
 
 % Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
 for k = 1:lengthF32y
-    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2,al2);
+    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2(k),om2,al2);
     %
     % Redefine the guess as the recently solved parameters
     guess = [ans(1) ans(2) ans(3) ans(4) ans(5) ans(6)];
@@ -124,11 +124,11 @@ for k = 1:lengthF32y
 end
 
 % Finding the x and y positions and al components based on th2, th3, and th4
-for k = 1:length(th2new)
-    r12x(k) = -(r2/2).*cos(th2new(k)); % assume symmetrical pedal crank
-    r12y(k) = -(r2/2).*sin(th2new(k)); 
-    r32x(k) = (r2/2).*cos(th2new(k)); 
-    r32y(k) = (r2/2).*sin(th2new(k)); 
+for k = 1:length(th2)
+    r12x(k) = -(r2/2).*cos(th2(k)); % assume symmetrical pedal crank
+    r12y(k) = -(r2/2).*sin(th2(k)); 
+    r32x(k) = (r2/2).*cos(th2(k)); 
+    r32y(k) = (r2/2).*sin(th2(k)); 
     
     r23x(k) = -(r3*lowerlegDistal).*cos(th3(k)); % lower leg cannot be divided by 2
     r23y(k) = -(r3*lowerlegDistal).*sin(th3(k)); 
@@ -140,15 +140,15 @@ for k = 1:length(th2new)
     r14x(k) = (r4*thighProximal).*cos(th4(k)); 
     r14y(k) = (r4*thighProximal).*sin(th4(k));
 
-    al2x(k) = 0 - (om2^2).*(r2/2).*cos(th2new(k)); 
-    al2y(k) = 0 - (om2^2).*(r2/2).*sin(th2new(k)); 
+    al2x(k) = 0 - (om2^2).*(r2/2).*cos(th2(k)); 
+    al2y(k) = 0 - (om2^2).*(r2/2).*sin(th2(k)); 
     
-    al3x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
-    al3y(k) = (0 - (om2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
+    al3x(k) = (0 - (om2^2).*(r2).*cos(th2(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2).*(r2).*sin(th2(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
     
-    al4x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
+    al4x(k) = (0 - (om2^2).*(r2).*cos(th2(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
     + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
-    al4y(k) = (0 - (om2^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
+    al4y(k) = (0 - (om2^2).*(r2).*sin(th2(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
     + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
 
 end
@@ -184,7 +184,7 @@ FKneePerpendicular = F(8, :).*cos(th3 + (pi/2)) + F(9,:).*sin(th3 + (pi/2)); % f
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips (ensure that this is accurate)
 figure(1)
-plot(th2new,F(end,:),"r",th2new,F(4, :),"b","LineWidth",1.5)
+plot(th2,F(end,:),"r",th2,F(4, :),"b","LineWidth",1.5)
 title("Torque at the Pedal and Hips vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Torque (N*m)")
@@ -192,7 +192,7 @@ legend("Torque of Hips","Torque of Pedals")
 
 %% Graph of the Force Components vs. Angle 2
 figure(2)
-plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
+plot(th2,FKneeParallel,"r",th2,FKneePerpendicular,"b", "LineWidth",1.5)
 title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Force (N)")
@@ -222,7 +222,7 @@ principalStrain3 = 0;
 
 %% Graph of the Force Components vs. Angle 2
 figure(2)
-plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
+plot(th2,FKneeParallel,"r",th2,FKneePerpendicular,"b", "LineWidth",1.5)
 title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
 xlabel("\theta_2 in radians")
 ylabel("Force (N)")
@@ -234,7 +234,7 @@ figure(3)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normStress, 'r-',"LineWidth",1.5)
+plot(th2, normStress, 'r-',"LineWidth",1.5)
 title('Normal Stress vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\sigma (MPa)')
@@ -243,7 +243,7 @@ grid on
 
 % Shear plot
 subplot(3,1,2)
-plot(th2new, shearStress, 'r-', "LineWidth",1.5)
+plot(th2, shearStress, 'r-', "LineWidth",1.5)
 title('Shear Stress vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\tau (MPa)')
@@ -252,7 +252,7 @@ grid on
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStress3, 'r-',"LineWidth",1.5)
+plot(th2, principalStress3, 'r-',"LineWidth",1.5)
 title('Maximum Principal Stress vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\sigma_3 (MPa)')
@@ -269,7 +269,7 @@ figure(4)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normStrain, 'r-', "LineWidth",1.5)
+plot(th2, normStrain, 'r-', "LineWidth",1.5)
 title('Normal Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\epsilon_\sigma (MPa)')
@@ -278,7 +278,7 @@ grid on
 
 % Shear plot
 subplot(3,1,2)
-plot(th2new, shearStrain, 'r-', "LineWidth",1.5)
+plot(th2, shearStrain, 'r-', "LineWidth",1.5)
 title('Shear Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\gamma (MPa)')
@@ -287,7 +287,7 @@ grid on
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStrain3, 'r-', "LineWidth",1.5)
+plot(th2, principalStrain3, 'r-', "LineWidth",1.5)
 title('Maximum Principal Strain vs. \theta_2')
 xlabel('\theta_2 (rad)')
 ylabel('\epsilon_3 (MPa)')
