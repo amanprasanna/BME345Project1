@@ -1,9 +1,11 @@
 % BME 345 Project 2
 % Jasmine, John, Aman, Mylah
 % Due: April 15, 2025
+
 clear
 clc
 close all
+
 %% Declarations (Adkin's updated given below)
 
 m = 75; % total mass of cyclist (kg)
@@ -25,8 +27,8 @@ r2 = 4*in2m;
 r3 = 21*in2m;
 r4 = 19*in2m;
 
-stemRadius = 7*10^-3; %Radius of tibial stem (m)
-%Source:
+stemRadius = 7*10^-3; % Radius of tibial stem (m)
+% Source:
 % https://www.link-ortho.com/fileadmin/user_upload/Fuer_den_Arzt/Produkte/Downloads/EN/719_MIRETO_OP_RevisionOP_en_2020-09_007.pdf
 stemCrossArea = 3.14 * stemRadius^2;
 
@@ -34,7 +36,6 @@ stemCrossArea = 3.14 * stemRadius^2;
 E_Ti = 113.8; %Elastic Modulus (MPa)
 v_Ti = 0.34; %Poisson's Ratio
 G_Ti = 42.4; %Rigidity Modulus (GPa)
-
 
 % Link 1 (frame) kinematics
 th1 = -pi/2 - atan(seatLength/seatHeight);
@@ -49,6 +50,7 @@ lowerlegDistal = 0.433;
 lowerlegProximal = 0.567; 
 
 % Link information (might not need these)
+pHuman = 985; %density (kg/m^3)
 pCarbonFiber = 1600; % density of carbon fiber bikes (kg/m^3)
 diameterR1 = 0.102; % diameter of frame 1 on the bike (cm to m)
 lengthCrank = 0.21; % m
@@ -56,12 +58,10 @@ heightCrank = .03; %m
 width = .005; %m
 
 % F32y Given 
-importF32y = xlsread("f32y.csv"); 
+importF32y = xlsread("f32y.xlsx"); 
 F32y = importF32y(:,2)';
 F23y = -F32y; 
-lengthF32y = length(importF32y);
-duration = importF32y(end,1) - importF32y(1,1); %would prefer to use end here
-
+duration = importF32y(end,1) - importF32y(1,1); 
 
 % Mass of Links (kg)
 m1 = 1.0; % frame mass approximation
@@ -69,6 +69,8 @@ m3 = 0.0465*m; % leg (no foot) using anthropometric table
 m4 = 0.100*m; % thigh (hip to knee) using anthropometric table
 
 % Radius of Gyration (w.r.t CoG) of Links
+k1 = diameterR1 / sqrt(2); %hip to bike pedal
+k2 = heightCrank / sqrt(12); %bike pedal to lower leg (assume center to bike pedal is a rectangular prism...need to take measurements on this)
 k3 = 0.302; %foot and leg (from anthropometric table)
 k4 = 0.323; %thigh (from anthropometric table)
 
@@ -76,7 +78,6 @@ k4 = 0.323; %thigh (from anthropometric table)
 I2z = m*(lengthCrank^2 + heightCrank^2) / 12; % rectangular prism
 I3 = m3*k3^2;
 I4 = m4*k4^2;
-
 
 % Forces Due to Gravity
 F1g = m1*g; %N
@@ -86,26 +87,29 @@ F4g = m4*g; %N
 
 
 % Steps 
-minRev = pi;
-maxRev = 7*pi; % (changed max here)
-th2 = linspace(minRev, maxRev, lengthF32y); 
-
-integerArray = numel(th2); 
+stepSize = pi/29; 
+minRev = pi; 
+maxRev = 7*pi; 
 
 % Crank Inputs if any
+Ta = 125; %N*m
 om2 = (maxRev - minRev) / duration; %rad/s
 al2 = 0; %rad/s^2
 
+th2new = minRev:stepSize:maxRev; 
+integerArray = numel(th2new); 
 
 % Guess in the form [th3 th4 om3 om4 al3 al4] with radians, not degrees
 guess = [(pi/2) (pi/4) 1 1 1 1];
 options = optimoptions('fsolve','Display','final'); 
 
+% remember to fix conversion with units
+
 %% Calculations
 
 % Finding the th3, th4, om3, om4, al3, al4 based on initial and new guesses
-for k = 1:lengthF32y
-    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2(k),om2,al2);
+for k = 1:integerArray
+    ans = fsolve(@fourbar_rev1,guess,options,r1,r2,r3,r4,th1,th2new(k),om2,al2);
     %
     % Redefine the guess as the recently solved parameters
     guess = [ans(1) ans(2) ans(3) ans(4) ans(5) ans(6)];
@@ -121,11 +125,11 @@ for k = 1:lengthF32y
 end
 
 % Finding the x and y positions and al components based on th2, th3, and th4
-for k = 1:length(th2)
-    r12x(k) = -(r2/2).*cos(th2(k)); % assume symmetrical pedal crank
-    r12y(k) = -(r2/2).*sin(th2(k)); 
-    r32x(k) = (r2/2).*cos(th2(k)); 
-    r32y(k) = (r2/2).*sin(th2(k)); 
+for k = 1:length(th2new)
+    r12x(k) = -(r2/2).*cos(th2new(k)); % assume symmetrical pedal crank
+    r12y(k) = -(r2/2).*sin(th2new(k)); 
+    r32x(k) = (r2/2).*cos(th2new(k)); 
+    r32y(k) = (r2/2).*sin(th2new(k)); 
     
     r23x(k) = -(r3*lowerlegDistal).*cos(th3(k)); % lower leg cannot be divided by 2
     r23y(k) = -(r3*lowerlegDistal).*sin(th3(k)); 
@@ -137,15 +141,15 @@ for k = 1:length(th2)
     r14x(k) = (r4*thighProximal).*cos(th4(k)); 
     r14y(k) = (r4*thighProximal).*sin(th4(k));
 
-    al2x(k) = 0 - (om2^2).*(r2/2).*cos(th2(k)); 
-    al2y(k) = 0 - (om2^2).*(r2/2).*sin(th2(k)); 
+    al2x(k) = 0 - (om2^2).*(r2/2).*cos(th2new(k)); 
+    al2y(k) = 0 - (om2^2).*(r2/2).*sin(th2new(k)); 
     
-    al3x(k) = (0 - (om2^2).*(r2).*cos(th2(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
-    al3y(k) = (0 - (om2).*(r2).*sin(th2(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
+    al3x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3*lowerlegDistal).*sin(th3(k)) - (om3(k)^2)*(r3*lowerlegDistal)*cos(th3(k))); 
+    al3y(k) = (0 - (om2).*(r2).*sin(th2new(k))) + (al3(k).*(r3*lowerlegDistal).*cos(th3(k)) - (om3(k)^2).*(r3*lowerlegDistal).*sin(th3(k)));
     
-    al4x(k) = (0 - (om2^2).*(r2).*cos(th2(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
+    al4x(k) = (0 - (om2^2).*(r2).*cos(th2new(k))) + (-al3(k).*(r3).*sin(th3(k)) - (om3(k)^2)*(r3)*cos(th3(k))) ...
     + (-al4(k).*(r4*thighDistal).*sin(th4(k)) - (om4(k).^2)*(r4*thighDistal).*cos(th4(k))); 
-    al4y(k) = (0 - (om2^2).*(r2).*sin(th2(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
+    al4y(k) = (0 - (om2^2).*(r2).*sin(th2new(k))) + (al3(k).*(r3).*cos(th3(k)) - (om3(k)^2).*(r3).*sin(th3(k))) ...
     + (al4(k).*(r4*thighDistal).*cos(th4(k)) - (om4(k).^2).*(r4*thighDistal).*sin(th4(k))); 
 
 end
@@ -159,7 +163,7 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
 -r12y(k)' r12x(k)' -r32y(k)'  1  0  0    0    0    0    0    0 0; 
      0    0     0    0    1    1     0    0    0    0    0    0;
      0    0     0    0    0    0     1    0    0    0    0    0;
-     0    0     0    0  -r23y(k)' r23x(k)' -r43y(k)' r43x(k)'  0    0    0    0;
+     0    0     0    0  -r23y(k)' -r43y(k)' r43x(k)'  0    0    0    0 0;
      0    0     0    0    0    0    0     1    0    1    0    0;
      0    0     0    0    0    0    0     0    1    0    1    0;
      0    0     0    0    0    0    0  -r34y(k)' r34x(k)' -r14y(k)' r14x(k)' 1;
@@ -168,62 +172,117 @@ A = [1    0     1    0    0    0     0    0    0    0    0    0;
      0    0     0    0    0    0    1     0    1    0    0    0];
 
 % Right hand side of the equation/ known variables
-b = [m2.*al2x(k) (m2.*al2y(k) - m2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) m3.*al3x(k) (m3.*al3y(k) - m3*g) I3.*al3(k) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k)) 0 0 0]';
+b = [m2.*al2x(k) (m2.*al2y(k) - m2*g - F32y(k)) (I2z*al2 - r32x(k).*F32y(k)) m3.*al3x(k) (m3.*al3y(k) - m3*g - F23y(k)) (I3.*al3(k) - r23x(k).*F23y(k)) m4.*al4x(k) (m4.*al4y(k) - m4*g) (I4.*al4(k)) 0 0 0]';
 
 F(:,k)= A\b;
 
 end
 
-% Solving for Thigh Force Components at the Knee to Graph 
-FKneeParallel = F(3, :).*cos(th4) + F(4,:).*sin(th4); % force of the knee in x direction (N)
-FKneePerpendicular = F(3, :).*cos(th4 + (pi/2)) + F(4,:).*sin(th4 + (pi/2)); % force of the knee in y direction (N)
+% Solving for Knee Force Components at the Knee to Graph (F43)
+FKneeParallel = F(6, :).*cos(th3) + F(7,:).*sin(th3); % force of the knee in x direction (N)
+FKneePerpendicular = F(6, :).*cos(th3 + (pi/2)) + F(7,:).*sin(th3 + (pi/2)); % force of the knee in y direction (N)
 
 
 %% Graph of Angle 2 vs. Torque of Pedal and Hips (ensure that this is accurate)
 figure(1)
-plot(th2,F(end,:),"r",th2,F(4, :),"b","LineWidth",1.5)
+plot(th2new,F(end,:),"r",th2new,F(4, :),"b","LineWidth",1.5)
 title("Torque at the Pedal and Hips vs. \theta_2")
-xlabel("\theta_2 in radians")
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel("Torque (N*m)")
 legend("Torque of Hips","Torque of Pedals")
 
 %% Graph of the Force Components vs. Angle 2
 figure(2)
-plot(th2,FKneeParallel,"r",th2,FKneePerpendicular,"b", "LineWidth",1.5)
+plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
 title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
-xlabel("\theta_2 in radians")
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel("Force (N)")
 legend("Force Parallel to Knee","Force Perpendicular to Knee")
 
+%% Calculating Normal/Shear/max Principal Stress on Stem
+% Using the force at the knee, calculate separately the normal and shear stress in the tibial stem. Also calculate the strain.
 
-%% Graph of Normal/Shear/max Principle Stress on Stem
+% Assumtpions:
+% normal stress along the stem is ONLY from the normal knee force
+% shear stress in the stem is ONLY from the shear force at the knee
+
+% Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
+% to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane). 
+
+proxKneeWidth = .004; %(m)
+stemWidth = proxKneeWidth/3;
+stemCrossArea = pi*(stemWidth/2)^2;
+
+
+normStress = FKneeParallel./stemCrossArea/1e6;
+shearStress = FKneePerpendicular./stemCrossArea/1e6;
+
+normYStrain = normStress./E_Ti;
+normXStrain = -(v_Ti)*normYStrain; 
+normZStrain = -(v_Ti)*normXStrain; 
+shearXYStrain = shearStress./G_Ti;
+
+sigx = F(7, :) / stemCrossArea;
+sigy = F(8,:) / stemCrossArea;
+sigavg = (sigx + sigy) ./2;
+R = sqrt(((sigx - sigy)/2).^2 + shearStress.^2);
+sig1 = sigavg + R;
+sig2 = 0;
+sig3 = sigavg - R;
+
+principalStress = sig3/1e6;
+
+strainx = -sigx*(v_Ti) / E_Ti;
+strainy = sigy / E_Ti;
+strainavg = (strainx + strainy) ./2;
+R2 = sqrt(((strainx - strainy)/2).^2 + shearXYStrain.^2);
+strain1 = strainavg + R2;
+strain2 = 0;
+strain3 = strainavg - R2;
+
+principalStrain = principalStress./E_Ti;
+
+%strainX = 
+% Strain in z direction needs to be found
+
+% for j = 1:length(normStress)
+%     stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
+%     principalStress(j) = max(eig(stressMatrix)); 
+% 
+%     strainMatrix = [normXStrain(j) shearXYStrain(j) 0; shearXYStrain(j) normYStrain(j) 0; 0 0 normZStrain(j)]; 
+%     principalStrain(j) = max(eig(strainMatrix));
+% end
+
+%% Graph of Normal/Shear/max Principle Stress on knee
+
 figure(3)
+
 % Normal plot
 subplot(3,1,1)
-plot(th2, normStress, 'r-',"LineWidth",1.5)
-title('Normal Stress vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, normStress, 'r-',"LineWidth",1.5)
+title('Normal Stress of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma (MPa)')
 legend('Normal Stress', 'Location', 'eastoutside')
-grid on
+
 
 % Shear plot
 subplot(3,1,2)
-plot(th2, shearStress, 'r-', "LineWidth",1.5)
-title('Shear Stress vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, shearStress, 'r-', "LineWidth",1.5)
+title('Shear Stress of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\tau (MPa)')
 legend('Shear Stress', 'Location', 'eastoutside')
-grid on
 
-% Maximum principal plot
+
+% Maximum principle plot
 subplot(3,1,3)
-plot(th2, principalStress, 'r-',"LineWidth",1.5)
-title('Maximum Principal Stress vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, principalStress, 'r-',"LineWidth",1.5)
+title('Maximum Principal Stress of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma_m_a_x (MPa)')
 legend('\sigma_3', 'Location', 'eastoutside')
-grid on
+
 
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
@@ -235,34 +294,31 @@ figure(4)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2, normStrain, 'r-', "LineWidth",1.5)
-title('Normal Strain vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, normYStrain, 'r-', th2new, normXStrain, 'b-', "LineWidth",1.5)
+title('Normal Strain of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\epsilon_\sigma (MPa)')
 legend('Normal Strain', 'Location', 'eastoutside')
-grid on
+
 
 % Shear plot
 subplot(3,1,2)
-plot(th2, shearStrain, 'r-', "LineWidth",1.5)
-title('Shear Strain vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, shearXYStrain, 'r-', "LineWidth",1.5)
+title('Shear Strain of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\gamma (MPa)')
 legend('Shear Strain', 'Location', 'eastoutside')
-grid on
+
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2, principalStrain, 'r-', "LineWidth",1.5)
-title('Maximum Principal Strain vs. \theta_2')
-xlabel('\theta_2 (rad)')
+plot(th2new, principalStrain, 'r-', "LineWidth",1.5)
+title('Maximum Principal Strain of a Knee Implant''s Stem vs. \theta_2')
+xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\epsilon_3 (MPa)')
 legend('\epsilon_3', 'Location', 'eastoutside')
-grid on
 
-% Adjust subplot spacing
-set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
-set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
+
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
 set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
