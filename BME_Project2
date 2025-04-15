@@ -58,7 +58,7 @@ heightCrank = .03; %m
 width = .005; %m
 
 % F32y Given 
-importF32y = xlsread("f32y.xlsx"); 
+importF32y = xlsread("f32y (1).csv"); 
 F32y = importF32y(:,2)';
 F23y = -F32y; 
 duration = importF32y(end,1) - importF32y(1,1); 
@@ -214,8 +214,8 @@ stemWidth = proxKneeWidth/3;
 stemCrossArea = pi*(stemWidth/2)^2;
 
 
-normStress = FKneeParallel./stemCrossArea/1e6;
-shearStress = FKneePerpendicular./stemCrossArea/1e6;
+normStress = FKneeParallel./stemCrossArea;
+shearStress = FKneePerpendicular./stemCrossArea;
 
 normYStrain = normStress./E_Ti;
 normXStrain = -(v_Ti)*normYStrain; 
@@ -230,7 +230,7 @@ sig1 = sigavg + R;
 sig2 = 0;
 sig3 = sigavg - R;
 
-principalStress = sig3/1e6;
+principalStress = sig3;
 
 strainx = -sigx*(v_Ti) / E_Ti;
 strainy = sigy / E_Ti;
@@ -259,34 +259,34 @@ figure(3)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normStress, 'r-',"LineWidth",1.5)
+plot(th2new, normStress .* (10^-6), 'r-',"LineWidth",1.5)
 title('Normal Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma (MPa)')
-legend('Normal Stress', 'Location', 'eastoutside')
+legend('Normal Y Stress', 'Location', 'eastoutside')
 
 
 % Shear plot
 subplot(3,1,2)
-plot(th2new, shearStress, 'r-', "LineWidth",1.5)
+plot(th2new, shearStress .* (10^-6), 'r-', "LineWidth",1.5)
 title('Shear Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\tau (MPa)')
-legend('Shear Stress', 'Location', 'eastoutside')
+legend('Shear XY Stress', 'Location', 'eastoutside')
 
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStress, 'r-',"LineWidth",1.5)
+plot(th2new, principalStress .* (10^-6), 'r-',"LineWidth",1.5)
 title('Maximum Principal Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma_m_a_x (MPa)')
-legend('\sigma_3', 'Location', 'eastoutside')
+legend('Max Compressive Stress: \sigma_3', 'Location', 'eastoutside')
 
 
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
-set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
+
 
 %% Graph of Normal/Shear/max Principle Strain on knee
 
@@ -294,31 +294,31 @@ figure(4)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normYStrain, 'r-', th2new, normXStrain, 'b-', "LineWidth",1.5)
+plot(th2new, normYStrain .* (10^-6), 'r-', th2new, normXStrain .* (10^-6), 'b-', "LineWidth",1.5)
 title('Normal Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\epsilon_\sigma (MPa)')
-legend('Normal Strain', 'Location', 'eastoutside')
+ylabel('Normal Strain (M\epsilon)')
+legend('Normal Y Strain', 'Normal X Strain',  'Location', 'eastoutside')
 
 
 % Shear plot
 subplot(3,1,2)
-plot(th2new, shearXYStrain, 'r-', "LineWidth",1.5)
+plot(th2new, shearXYStrain .* (10^-6), 'r-', "LineWidth",1.5)
 title('Shear Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\gamma (MPa)')
+ylabel('Shear Strain (M\gamma)')
 legend('Shear Strain', 'Location', 'eastoutside')
 
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStrain, 'r-', "LineWidth",1.5)
+plot(th2new, principalStrain .* (10^-6), 'r-', "LineWidth",1.5)
 title('Maximum Principal Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\epsilon_3 (MPa)')
-legend('\epsilon_3', 'Location', 'eastoutside')
+ylabel('Maximum Principal Strain (M\epsilon) ')
+legend('Max Compressive Strain: \epsilon_3', 'Location', 'eastoutside')
 
 
 % Adjust subplot spacing
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
-set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10, 'XMinorTick', 'on', 'YMinorTick', 'on')
+set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10)
