@@ -212,8 +212,8 @@ stemWidth = proxKneeWidth/3;
 stemCrossArea = pi*(stemWidth/2)^2;
 
 
-normStress = FKneePerpendicular./stemCrossArea;
-shearStress = FKneeParallel./stemCrossArea;
+normStress = FKneeParallel./stemCrossArea;
+shearStress = FKneePerpendicular./stemCrossArea;
 
 normYStrain = normStress./E_Ti;
 normXStrain = -(v_Ti)*normYStrain; 
