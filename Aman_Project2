@@ -297,7 +297,7 @@ subplot(3,1,1)
 plot(th2new, normYStrain, 'r-', th2new, normXStrain, 'b-', "LineWidth",1.5)
 title('Normal Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\epsilon_\sigma (MPa)')
+ylabel('Normal Strain (\epsilon)')
 legend('Normal Strain', 'Location', 'eastoutside')
 grid on
 
@@ -306,7 +306,7 @@ subplot(3,1,2)
 plot(th2new, shearXYStrain, 'r-', "LineWidth",1.5)
 title('Shear Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\gamma (MPa)')
+ylabel('Shear Strain (\gamma)')
 legend('Shear Strain', 'Location', 'eastoutside')
 grid on
 
@@ -315,7 +315,7 @@ subplot(3,1,3)
 plot(th2new, principalStrain, 'r-', "LineWidth",1.5)
 title('Maximum Principal Strain of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
-ylabel('\epsilon_3 (MPa)')
+ylabel('Normal Strain (\epsilon)')
 legend('\epsilon_3', 'Location', 'eastoutside')
 grid on
 
