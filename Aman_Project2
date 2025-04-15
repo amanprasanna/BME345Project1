@@ -259,7 +259,7 @@ figure(3)
 
 % Normal plot
 subplot(3,1,1)
-plot(th2new, normStress, 'r-',"LineWidth",1.5)
+plot(th2new, normStress .* (10^-6), 'r-',"LineWidth",1.5)
 title('Normal Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma (MPa)')
@@ -268,7 +268,7 @@ grid on
 
 % Shear plot
 subplot(3,1,2)
-plot(th2new, shearStress, 'r-', "LineWidth",1.5)
+plot(th2new, shearStress .* (10^-6), 'r-', "LineWidth",1.5)
 title('Shear Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\tau (MPa)')
@@ -277,7 +277,7 @@ grid on
 
 % Maximum principle plot
 subplot(3,1,3)
-plot(th2new, principalStress, 'r-',"LineWidth",1.5)
+plot(th2new, principalStress .* (10^-6), 'r-',"LineWidth",1.5)
 title('Maximum Principal Stress of a Knee Implant''s Stem vs. \theta_2')
 xlabel("Angle around the pedal / \theta_2 (rads)")
 ylabel('\sigma_m_a_x (MPa)')
