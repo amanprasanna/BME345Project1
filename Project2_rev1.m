@@ -184,7 +184,7 @@ for j = 1:length(r2)
 
 
     %% Graph of Angle 2 vs. Torque of Pedal and Hips (ensure that this is accurate)
-    figure(1*j)
+    figure(1+j)
     plot(th2new,F(end,:),"r",th2new,F(4, :),"b","LineWidth",1.5)
     title("Torque at the Pedal and Hips vs. \theta_2")
     xlabel("Angle around the pedal / \theta_2 (rads)")
@@ -192,7 +192,7 @@ for j = 1:length(r2)
     legend("Torque of Hips","Torque of Pedals")
 
     %% Graph of the Force Components vs. Angle 2
-    figure(2*j)
+    figure(2+j)
     plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
     title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
     xlabel("Angle around the pedal / \theta_2 (rads)")
@@ -255,7 +255,7 @@ for j = 1:length(r2)
 
     %% Graph of Normal/Shear/max Principle Stress on knee
 
-    figure(3*j)
+    figure(3+j)
 
     % Normal plot
     subplot(3,1,1)
@@ -290,7 +290,7 @@ for j = 1:length(r2)
 
     %% Graph of Normal/Shear/max Principle Strain on knee
 
-    figure(4*j)
+    figure(4+j)
 
     % Normal plot
     subplot(3,1,1)
