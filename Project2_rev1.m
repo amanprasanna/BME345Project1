@@ -12,6 +12,8 @@ m = 75; % total mass of cyclist (kg)
 g = -9.81; % gravity (m/s^2)
 numRev = 3; % number of revolutions
 
+figNum = 1;
+
 % Conversions
 in2m = 0.0254; % Converts inches to meters
 
@@ -26,6 +28,7 @@ r1 = sqrt(seatHeight^2+seatLength^2);
 r2 = [2 4 6].*in2m;
 r3 = 21*in2m;
 r4 = 19*in2m;
+
 
 stemRadius = 7*10^-3; % Radius of tibial stem (m)
 % Source:
@@ -184,142 +187,150 @@ for j = 1:length(r2)
 
 
     %% Graph of Angle 2 vs. Torque of Pedal and Hips (ensure that this is accurate)
-    figure(1+j)
-    plot(th2new,F(end,:),"r",th2new,F(4, :),"b","LineWidth",1.5)
-    title("Torque at the Pedal and Hips vs. \theta_2")
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel("Torque (N*m)")
-    legend("Torque of Hips","Torque of Pedals")
+    for f = 1:4
+        figure(figNum)
+        switch(f)
+            case 1
+        % figure(1)
+        plot(th2new,F(end,:),"r",th2new,F(4, :),"b","LineWidth",1.5)
+        title("Torque at the Pedal and Hips vs. \theta_2")
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel("Torque (N*m)")
+        legend("Torque of Hips","Torque of Pedals")
 
-    %% Graph of the Force Components vs. Angle 2
-    figure(2+j)
-    plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
-    title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel("Force (N)")
-    legend("Force Parallel to Knee","Force Perpendicular to Knee")
+        %% Graph of the Force Components vs. Angle 2
+            case 2
+        % figure(2)
+        plot(th2new,FKneeParallel,"r",th2new,FKneePerpendicular,"b", "LineWidth",1.5)
+        title("Force Components Parallel & Perpendicular to the Knee vs. \theta_2")
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel("Force (N)")
+        legend("Force Parallel to Knee","Force Perpendicular to Knee")
 
-    %% Calculating Normal/Shear/max Principal Stress on Stem
-    % Using the force at the knee, calculate separately the normal and shear stress in the tibial stem. Also calculate the strain.
+        %% Calculating Normal/Shear/max Principal Stress on Stem
+        % Using the force at the knee, calculate separately the normal and shear stress in the tibial stem. Also calculate the strain.
 
-    % Assumtpions:
-    % normal stress along the stem is ONLY from the normal knee force
-    % shear stress in the stem is ONLY from the shear force at the knee
+        % Assumtpions:
+        % normal stress along the stem is ONLY from the normal knee force
+        % shear stress in the stem is ONLY from the shear force at the knee
 
-    % Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
-    % to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane).
+        % Neglect the normal force in the horizontal direction, since the stem has a large cross-sectional area perpendicular
+        % to that direction. Also, you may assume no stress in the z direction (the direction perpendicular to the coronal plane).
 
-    proxKneeWidth = .004; %(m)
-    stemWidth = proxKneeWidth/3;
-    stemCrossArea = pi*(stemWidth/2)^2;
-
-
-    normStress = FKneeParallel./stemCrossArea;
-    shearStress = FKneePerpendicular./stemCrossArea;
-
-    normYStrain = normStress./E_Ti;
-    normXStrain = -(v_Ti)*normYStrain;
-    normZStrain = -(v_Ti)*normXStrain;
-    shearXYStrain = shearStress./G_Ti;
-
-    sigx = F(7, :) / stemCrossArea;
-    sigy = F(8,:) / stemCrossArea;
-    sigavg = (sigx + sigy) ./2;
-    R = sqrt(((sigx - sigy)/2).^2 + shearStress.^2);
-    sig1 = sigavg + R;
-    sig2 = 0;
-    sig3 = sigavg - R;
-
-    principalStress = sig3;
-
-    strainx = -sigx*(v_Ti) / E_Ti;
-    strainy = sigy / E_Ti;
-    strainavg = (strainx + strainy) ./2;
-    R2 = sqrt(((strainx - strainy)/2).^2 + shearXYStrain.^2);
-    strain1 = strainavg + R2;
-    strain2 = 0;
-    strain3 = strainavg - R2;
-
-    principalStrain = principalStress./E_Ti;
-
-    %strainX =
-    % Strain in z direction needs to be found
-
-    % for j = 1:length(normStress)
-    %     stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
-    %     principalStress(j) = max(eig(stressMatrix));
-    %
-    %     strainMatrix = [normXStrain(j) shearXYStrain(j) 0; shearXYStrain(j) normYStrain(j) 0; 0 0 normZStrain(j)];
-    %     principalStrain(j) = max(eig(strainMatrix));
-    % end
-
-    %% Graph of Normal/Shear/max Principle Stress on knee
-
-    figure(3+j)
-
-    % Normal plot
-    subplot(3,1,1)
-    plot(th2new, normStress .* (10^-6), 'r-',"LineWidth",1.5)
-    title('Normal Stress of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('\sigma (MPa)')
-    legend('Normal Y Stress', 'Location', 'eastoutside')
+        proxKneeWidth = .004; %(m)
+        stemWidth = proxKneeWidth/3;
+        stemCrossArea = pi*(stemWidth/2)^2;
 
 
-    % Shear plot
-    subplot(3,1,2)
-    plot(th2new, shearStress .* (10^-6), 'r-', "LineWidth",1.5)
-    title('Shear Stress of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('\tau (MPa)')
-    legend('Shear XY Stress', 'Location', 'eastoutside')
+        normStress = FKneeParallel./stemCrossArea;
+        shearStress = FKneePerpendicular./stemCrossArea;
+
+        normYStrain = normStress./E_Ti;
+        normXStrain = -(v_Ti)*normYStrain;
+        normZStrain = -(v_Ti)*normXStrain;
+        shearXYStrain = shearStress./G_Ti;
+
+        sigx = F(7, :) / stemCrossArea;
+        sigy = F(8,:) / stemCrossArea;
+        sigavg = (sigx + sigy) ./2;
+        R = sqrt(((sigx - sigy)/2).^2 + shearStress.^2);
+        sig1 = sigavg + R;
+        sig2 = 0;
+        sig3 = sigavg - R;
+
+        principalStress = sig3;
+
+        strainx = -sigx*(v_Ti) / E_Ti;
+        strainy = sigy / E_Ti;
+        strainavg = (strainx + strainy) ./2;
+        R2 = sqrt(((strainx - strainy)/2).^2 + shearXYStrain.^2);
+        strain1 = strainavg + R2;
+        strain2 = 0;
+        strain3 = strainavg - R2;
+
+        principalStrain = principalStress./E_Ti;
+
+        %strainX =
+        % Strain in z direction needs to be found
+
+        % for j = 1:length(normStress)
+        %     stressMatrix = [0 shearStress(j); shearStress(j) normStress(j)];
+        %     principalStress(j) = max(eig(stressMatrix));
+        %
+        %     strainMatrix = [normXStrain(j) shearXYStrain(j) 0; shearXYStrain(j) normYStrain(j) 0; 0 0 normZStrain(j)];
+        %     principalStrain(j) = max(eig(strainMatrix));
+        % end
+
+        %% Graph of Normal/Shear/max Principle Stress on knee
+
+            case 3
+        % figure(3)
+        % Normal plot
+        subplot(3,1,1)
+        plot(th2new, normStress .* (10^-6), 'r-',"LineWidth",1.5)
+        title('Normal Stress of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('\sigma (MPa)')
+        legend('Normal Y Stress', 'Location', 'eastoutside')
 
 
-    % Maximum principle plot
-    subplot(3,1,3)
-    plot(th2new, principalStress .* (10^-6), 'r-',"LineWidth",1.5)
-    title('Maximum Principal Stress of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('\sigma_m_a_x (MPa)')
-    legend('Max Compressive Stress: \sigma_3', 'Location', 'eastoutside')
+        % Shear plot
+        subplot(3,1,2)
+        plot(th2new, shearStress .* (10^-6), 'r-', "LineWidth",1.5)
+        title('Shear Stress of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('\tau (MPa)')
+        legend('Shear XY Stress', 'Location', 'eastoutside')
 
 
-    % Adjust subplot spacing
-    set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+        % Maximum principle plot
+        subplot(3,1,3)
+        plot(th2new, principalStress .* (10^-6), 'r-',"LineWidth",1.5)
+        title('Maximum Principal Stress of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('\sigma_m_a_x (MPa)')
+        legend('Max Compressive Stress: \sigma_3', 'Location', 'eastoutside')
 
 
-    %% Graph of Normal/Shear/max Principle Strain on knee
-
-    figure(4+j)
-
-    % Normal plot
-    subplot(3,1,1)
-    plot(th2new, normYStrain .* (10^-6), 'r-', th2new, normXStrain .* (10^-6), 'b-', "LineWidth",1.5)
-    title('Normal Strain of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('Normal Strain (M\epsilon)')
-    legend('Normal Y Strain', 'Normal X Strain',  'Location', 'eastoutside')
+        % Adjust subplot spacing
+        set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
 
 
-    % Shear plot
-    subplot(3,1,2)
-    plot(th2new, shearXYStrain .* (10^-6), 'r-', "LineWidth",1.5)
-    title('Shear Strain of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('Shear Strain (M\gamma)')
-    legend('Shear Strain', 'Location', 'eastoutside')
+        %% Graph of Normal/Shear/max Principle Strain on knee
+            case 4
+        % figure(4)
+        % Normal plot
+        subplot(3,1,1)
+        plot(th2new, normYStrain .* (10^-6), 'r-', th2new, normXStrain .* (10^-6), 'b-', "LineWidth",1.5)
+        title('Normal Strain of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('Normal Strain (M\epsilon)')
+        legend('Normal Y Strain', 'Normal X Strain',  'Location', 'eastoutside')
 
 
-    % Maximum principle plot
-    subplot(3,1,3)
-    plot(th2new, principalStrain .* (10^-6), 'r-', "LineWidth",1.5)
-    title('Maximum Principal Strain of a Knee Implant''s Stem vs. \theta_2')
-    xlabel("Angle around the pedal / \theta_2 (rads)")
-    ylabel('Maximum Principal Strain (M\epsilon) ')
-    legend('Max Compressive Strain: \epsilon_3', 'Location', 'eastoutside')
+        % Shear plot
+        subplot(3,1,2)
+        plot(th2new, shearXYStrain .* (10^-6), 'r-', "LineWidth",1.5)
+        title('Shear Strain of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('Shear Strain (M\gamma)')
+        legend('Shear Strain', 'Location', 'eastoutside')
 
 
-    % Adjust subplot spacing
-    set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
-    set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10)
+        % Maximum principle plot
+        subplot(3,1,3)
+        plot(th2new, principalStrain .* (10^-6), 'r-', "LineWidth",1.5)
+        title('Maximum Principal Strain of a Knee Implant''s Stem vs. \theta_2')
+        xlabel("Angle around the pedal / \theta_2 (rads)")
+        ylabel('Maximum Principal Strain (M\epsilon) ')
+        legend('Max Compressive Strain: \epsilon_3', 'Location', 'eastoutside')
+
+
+        % Adjust subplot spacing
+        set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+        set(findall(gcf, 'Type', 'axes'), 'FontName', 'Arial', 'FontSize', 10)
+        end
+        figNum = figNum + 1;
+    end
+
 end
